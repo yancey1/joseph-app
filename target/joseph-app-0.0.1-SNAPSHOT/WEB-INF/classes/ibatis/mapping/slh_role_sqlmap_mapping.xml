@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_role">
+
+	<typeAlias alias="Role" type="com.yancey.manager.domain.Role" />
+	<typeAlias alias="UserRole" type="com.yancey.manager.domain.UserRole" />
+	<typeAlias alias="RoleForm" type="com.yancey.manager.form.RoleForm" />
+	<typeAlias alias="RoleMenu" type="com.yancey.manager.domain.RoleMenu" />
+	
+	<resultMap id="abatorgenerated_RoleResult" class="Role" >
+	    <result column="role_id" property="roleId" />
+	    <result column="role_name" property="roleName" />
+	    <result column="roles" property="roles" />
+	    <result column="description" property="description" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	    <result column="role_id" property="menus" select="slh_role.getRoleMenusByRoleId"/>
+	</resultMap>
+	
+	<select id="getRoleMenusByRoleId" resultClass="RoleMenu" parameterClass="java.lang.Integer">
+	select m.resource_id as resourceId,m.role_id AS roleId from slh_role r,slh_role_resource m where r.role_id = m.role_id and r.role_id = #value#
+	
+	</select>
+	
+	
+	<sql id="slh_role.abatorgenerated_slh_role_query_conditions" >
+	    <dynamic>
+	    	<isNotEmpty property="roleName">
+	    		<isNotNull prepend="and" property="roleName" >
+			        role_name LIKE '%$roleName$%'
+			    </isNotNull>
+	    	</isNotEmpty>
+	      	<isNotEmpty property="roles">
+	    		<isNotNull prepend="and" property="roles" >
+			        roles = #roles#
+			    </isNotNull>
+	    	</isNotEmpty>
+	    	<isNotEmpty property="description">
+	    		<isNotNull prepend="and" property="description" > 
+		        description = #description#
+		      </isNotNull>
+	    	</isNotEmpty>
+	      
+	      
+	    </dynamic>
+	</sql>
+
+	<select id="query_slh_count" resultClass="java.lang.Integer"	parameterClass="RoleForm">
+		SELECT COUNT(1) FROM slh_role
+		WHERE 1 = 1
+		<include refid="slh_role.abatorgenerated_slh_role_query_conditions"/>
+	</select>
+	<select id="select_slh_model_page_list" resultMap="abatorgenerated_RoleResult" parameterClass="RoleForm">
+		SELECT role_id, role_name, roles, description, create_time, modify_time
+		FROM slh_role
+		WHERE 1 = 1
+		<dynamic>
+	      <isNotNull prepend="and" property="roleName" >
+	        role_name LIKE '%$roleName$%'
+	      </isNotNull>
+	    </dynamic>
+		ORDER BY modify_time DESC
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows#
+	</select>
+	<select id="select_slh_model_list" resultMap="abatorgenerated_RoleResult" parameterClass="RoleForm">
+		SELECT role_id, role_name, roles, description, create_time, modify_time
+		FROM slh_role
+		WHERE 1 = 1
+		<dynamic>
+	      <isNotNull prepend="and" property="roleName" >
+	        role_name LIKE '%$roleName$%'
+	      </isNotNull>
+	    </dynamic>
+		ORDER BY modify_time DESC
+	</select>
+	
+	<select id="select_slh_user_role_list" resultClass="UserRole" parameterClass="Role">
+		SELECT role_id AS roleId
+		FROM slh_user_role
+		WHERE 1 = 1
+		<dynamic>
+	      <isNotNull prepend="and" property="roleId" >
+	        role_id = #roleId#
+	      </isNotNull>
+	    </dynamic>
+	</select>
+	
+	<select id="select_slh_model" resultMap="abatorgenerated_RoleResult" parameterClass="RoleForm">
+		SELECT role_id, role_name, roles, description, create_time, modify_time
+		FROM slh_role
+		WHERE 1 = 1
+		<include refid="slh_role.abatorgenerated_slh_role_query_conditions"/>
+		<dynamic>
+			<isNotNull prepend="and" property="roleId">
+				role_id = #roleId#
+			</isNotNull>
+		</dynamic>
+	</select>
+	<select id="select_slh_model_by_name" resultMap="abatorgenerated_RoleResult" parameterClass="RoleForm">
+		SELECT role_id, role_name, roles, description, create_time, modify_time
+		FROM slh_role
+		WHERE 1 = 1
+		<include refid="slh_role.abatorgenerated_slh_role_query_conditions"/>
+		<dynamic>
+			<isNotNull prepend="and" property="roleName">
+				role_name = #roleName#
+			</isNotNull>
+		</dynamic>
+	</select>
+	
+	<insert id="insert_slh_model" parameterClass="RoleForm" >
+	  INSERT INTO slh_role (role_name, roles, description, create_time, modify_time)
+	  VALUES (#roleName#, #roles#, #description#, NOW(), NOW())
+	  <selectKey resultClass="java.lang.Integer" keyProperty="roleId" >
+	    SELECT LAST_INSERT_ID()
+	  </selectKey>
+	</insert>
+	
+	<update id="update_slh_model" parameterClass="RoleForm" >
+	  UPDATE slh_role SET modify_time = NOW()
+	  <dynamic>
+	    <isNotNull prepend="," property="roleName">
+	      role_name = #roleName#
+	    </isNotNull>
+	    <isNotNull prepend="," property="roles">
+	      roles = #roles#
+	    </isNotNull>
+	    <isNotNull prepend="," property="description">
+	      description = #description#
+	    </isNotNull>
+	  </dynamic>
+	  WHERE role_id = #roleId#
+	</update>
+	
+	<delete id="delete_slh_model" parameterClass="Role">
+		delete from slh_role where role_id = #roleId#
+	</delete>
+	
+	
+	<!-- start 角色权限 -->
+	
+	<resultMap id="role_menu_result" class="RoleMenu">
+		<result column="resource_id" property="resourceId"/>
+		<result column="role_id" property="roleId"/>
+	</resultMap>
+	
+	<select id="select_slh_role_menu" resultMap="role_menu_result" parameterClass="RoleMenu">
+		select resource_id,role_id from slh_role_resource where resource_id = #resourceId# and role_id = #roleId#
+	</select>
+	
+	<insert id="insert_slh_role_menu" parameterClass="RoleMenu">
+		insert into slh_role_resource(resource_id,role_id) values(#resourceId#,#roleId#)
+	</insert>
+	<delete id="delete_slh_role_menu" parameterClass="RoleMenu">
+		delete from slh_role_resource where role_id=#roleId#
+	</delete>
+	
+	<delete id="deleteRoleByMenuId" parameterClass="RoleMenu">
+		delete from slh_role_resource where resource_id=#resourceId#
+	</delete>
+	<!-- end 角色权限 -->
+		
+</sqlMap>

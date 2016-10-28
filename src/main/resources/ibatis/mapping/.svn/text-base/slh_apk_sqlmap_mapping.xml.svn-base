@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_apk">
+
+	<typeAlias alias="Apk" type="com.yancey.manager.domain.Apk" />
+	<typeAlias alias="Image" type="com.yancey.manager.domain.Image" />
+	<typeAlias alias="LabelForm" type="com.yancey.manager.form.LabelForm" />
+	
+	<resultMap id="ApkResult" class="Apk" >
+	    <result column="apk_id" property="apkId" />
+	    <result column="apk_name" property="apkName" />
+	    <result column="brief_introduction" property="briefIntroduction" />
+	    <result column="description" property="description" />
+	    <result column="download_num" property="downloadNum" />
+	    <result column="version_code" property="versionCode" />
+	    <result column="version_name" property="versionName" />
+	     <result column="file_md5" property="fileMd5" />
+	    <result column="file_size" property="fileSize" />
+	    <result column="package_name" property="packageName" />
+	    <result column="file_name" property="fileName" />
+	    <result column="download_url" property="downloadUrl" />
+	    <result column="local_path" property="localPath" />
+	    <result column="png_icon_id" property="pngIconId" />
+	    <result column="jpg_icon_id" property="jpgIconId" />
+	    <result column="status" property="status" />
+	    <result column="mark" property="mark" />
+	    <result column="creator" property="creator" />
+	    <result column="from" property="from" />
+	    <result column="company" property="company" />
+	    <result column="company_type" property="companyType" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	    <result column="jpg_icon_id" property="icon" select="slh_apk.getImageByJpgIconId"/>
+	</resultMap> 
+	
+	<resultMap id="ApkImageResult" class="Apk" >
+	    <result column="apk_id" property="apkId" />
+	    <result column="apk_name" property="apkName" />
+	    <result column="brief_introduction" property="briefIntroduction" />
+	    <result column="description" property="description" />
+	    <result column="download_num" property="downloadNum" />
+	    <result column="version_code" property="versionCode" />
+	    <result column="version_name" property="versionName" />
+	     <result column="file_md5" property="fileMd5" />
+	    <result column="file_size" property="fileSize" />
+	    <result column="package_name" property="packageName" />
+	    <result column="file_name" property="fileName" />
+	    <result column="download_url" property="downloadUrl" />
+	    <result column="local_path" property="localPath" />
+	    <result column="png_icon_id" property="pngIconId" />
+	    <result column="jpg_icon_id" property="jpgIconId" />
+	    <result column="status" property="status" />
+	    <result column="mark" property="mark" />
+	    <result column="creator" property="creator" />
+	    <result column="from" property="from" />
+	    <result column="company_type" property="companyType" />
+	    <result column="company" property="company" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	    <result column="apk_id" property="images" select="slh_apk.getImagesByApkId"/>
+	    <result column="jpg_icon_id" property="icon" select="slh_apk.getImageByJpgIconId"/>
+	</resultMap> 
+	
+	<sql id="slh_apk.abatorgenerated_slh_apk_query_conditions" >
+	    <dynamic>
+	   		<isNotEmpty property="apkName">
+		     	<isNotNull prepend="and" property="apkName">
+		     		a.apk_name like '%$apkName$%'
+		     	</isNotNull>
+	     	</isNotEmpty>
+	     	<isNotEmpty property="status">
+		     	<isNotNull prepend="and" property="status">
+		     		a.status = #status#
+		     	</isNotNull>
+	     	</isNotEmpty>
+	     	<isNotEmpty property="mark">
+		     	<isNotNull prepend="and" property="mark">
+		     		a.mark like '%$mark$%'
+		     	</isNotNull>
+	     	</isNotEmpty>
+	     	<isNotEmpty property="company">
+		     	<isNotNull prepend="and" property="company">
+		     		a.company like '%$company$%'
+		     	</isNotNull>
+	     	</isNotEmpty>
+	    </dynamic>
+	</sql>
+	
+	<select id="getlabelApkByApkId" resultClass="LabelForm" parameterClass="java.lang.Integer">
+	 	SELECT
+			l.label_name AS labelName,
+			l.label_id AS labelId,
+			l.creator AS creator,
+			l.description AS description,
+			l.create_time AS createTime,
+			l.modify_time AS modifyTime
+		FROM
+			slh_label l,
+			slh_apk_label a
+		WHERE
+			l.label_id = a.label_id
+		AND a.apk_id = #value#
+	</select>
+	<select id="getImagesByApkId" resultClass="Image" parameterClass="java.lang.Integer">
+	 	SELECT
+			i.image_id AS imageId,
+			i.image_name AS imageName,
+			i.image_type AS imageType,
+			i.image_width AS imageWidth,
+			i.image_height AS imageHeight,
+			i.hd_image_url AS hdImgaeUrl,
+			i.nhd_image_url AS nhdImageUrl,
+			i.status AS status,
+			i.creator AS creator,
+			i.create_time AS createTime,
+			i.modify_time AS modifyTime
+		FROM
+			slh_image i,
+			slh_apk_image a
+		WHERE
+			i.image_id = a.image_id
+		AND a.apk_id = #value#
+	</select>
+	<select id="getImageByJpgIconId" resultClass="Image" parameterClass="java.lang.Integer">
+	 	SELECT
+			i.image_id AS imageId,
+			i.image_name AS imageName,
+			i.image_type AS imageType,
+			i.image_width AS imageWidth,
+			i.image_height AS imageHeight,
+			i.hd_image_url AS hdImgaeUrl,
+			i.nhd_image_url AS nhdImageUrl,
+			i. status AS stastus,
+			i.creator AS creator,
+			i.create_time AS createTime,
+			i.modify_time AS modifyTime
+		FROM
+			slh_image i
+		WHERE
+			i.image_id = #value#
+	</select>
+
+	<select id="select_slh_apk_page_list" resultMap="ApkResult" parameterClass="Apk">
+		SELECT 
+			a.apk_id,
+			a.apk_name,
+			a.brief_introduction,
+			a.description,
+			a.download_num,
+			a.version_code,
+			a.version_name,
+			a.file_md5,
+			a.file_size,
+			a.package_name,
+			a.file_name,
+			a.download_url,
+			a.local_path,
+			a.png_icon_id,
+			a.jpg_icon_id,
+			a.status,
+			a.mark,
+			a.company,
+			a.creator,
+			a.from,
+			a.company_type,
+			a.create_time,
+			a.modify_time
+		FROM
+			slh_apk a 
+		WHERE 1 = 1 
+		<include refid="slh_apk.abatorgenerated_slh_apk_query_conditions"/>
+		<!-- <dynamic>
+			<isNotNull prepend="and" property="packageName">
+				a.package_name = #packageName#
+			</isNotNull>
+			<isNotEmpty property="lbId">
+			     	<isNotNull prepend="and" property="lbId">
+			     		a.apk_id in(select b.apk_id from slh_apk_label b where b.label_id = #lbId#)
+			     	</isNotNull>
+		     	</isNotEmpty>
+		     	<isNotEmpty property="from">
+		     	<isEqual property="flag" compareValue="1" prepend="and"> 
+		     		a.`from` = #from#
+		     	</isEqual>
+			    <isEqual property="flag" compareValue="0" prepend="and">
+		     		<isEqual property="cType" compareValue="1">cType: 1 TYD   0 Other
+			     		(a.`from` = #from# or a.`from` ='0')
+			     	</isEqual>
+			     	<isEqual property="cType" compareValue="0">
+			     		(a.`from` = #from# or a.`from` ='0' or a.`from`='tyd000')
+			     	</isEqual>
+		     	</isEqual>
+		     	</isNotEmpty>
+		</dynamic> -->
+		ORDER BY a.modify_time DESC 
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="select_slh_apk_list_count" resultClass="int" parameterClass="Apk">
+		SELECT 
+			COUNT(1)
+		FROM
+			slh_apk a 
+		WHERE 1 = 1 and a.status != 0
+		<dynamic>
+			<isNotEmpty property="from">
+		     	<isEqual property="flag" compareValue="1" prepend="and"> 
+		     		a.`from` = #from#
+		     	</isEqual>
+			    <isEqual property="flag" compareValue="0" prepend="and">
+		     		<isEqual property="cType" compareValue="1"><!-- cType: 1 TYD   0 Other -->
+			     		(a.`from` = #from# or a.`from` ='0')
+			     	</isEqual>
+			     	<isEqual property="cType" compareValue="0">
+			     		(a.`from` = #from# or a.`from` ='0' or a.`from`='tyd000')
+			     	</isEqual>
+		     	</isEqual>
+	     	</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="select_slh_apk" resultMap="ApkImageResult" parameterClass="Apk">
+		SELECT
+			a.apk_id,
+			a.apk_name,
+			a.brief_introduction,
+			a.description,
+			a.download_num,
+			a.version_code,
+			a.version_name,
+			a.file_md5,
+			a.file_size,
+			a.package_name,
+			a.file_name,
+			a.download_url,
+			a.local_path,
+			a.png_icon_id,
+			a.jpg_icon_id,
+			a.status,
+			a.mark,
+			a.from,
+			a.company,
+			a.company_type,
+			a.creator,
+			a.create_time,
+			a.modify_time
+		FROM
+			slh_apk a
+		WHERE 1 = 1
+		<dynamic>
+			<isNotNull prepend="and" property="apkId">
+				apk_id = #apkId#
+			</isNotNull>
+		</dynamic>
+	</select>
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="ApkImageResult" parameterClass="java.lang.Integer">
+		SELECT
+			a.apk_id,
+			a.apk_name,
+			a.brief_introduction,
+			a.description,
+			a.download_num,
+			a.version_code,
+			a.version_name,
+			a.file_md5,
+			a.file_size,
+			a.package_name,
+			a.file_name,
+			a.download_url,
+			a.local_path,
+			a.png_icon_id,
+			a.jpg_icon_id,
+			a.status,
+			a.mark,
+			a.from,
+			a.company,
+			a.company_type,
+			a.creator,
+			a.create_time,
+			a.modify_time
+		FROM
+			slh_apk a
+		WHERE 1 = 1
+		and apk_id=#id#
+	</select>
+	
+	<select id="select_slh_apk_on_line" resultMap="ApkImageResult" parameterClass="Apk">
+		SELECT
+			a.apk_id,
+			a.apk_name,
+			a.brief_introduction,
+			a.description,
+			a.download_num,
+			a.version_code,
+			a.version_name,
+			a.file_md5,
+			a.file_size,
+			a.package_name,
+			a.file_name,
+			a.download_url,
+			a.local_path,
+			a.png_icon_id,
+			a.jpg_icon_id,
+			a.status,
+			a.mark,
+			a.from,
+			a.company,
+			a.company_type,
+			a.creator,
+			a.create_time,
+			a.modify_time
+		FROM
+			slh_apk a
+		WHERE 1 = 1
+		<dynamic>
+			<isNotNull prepend="and" property="packageName">
+				package_name = #packageName#
+			</isNotNull>
+		     	<isNotEmpty property="status">
+			     	<isNotNull prepend="and" property="status">
+			     		a.status = #status#
+			     	</isNotNull>
+		     	</isNotEmpty>
+		     	<isEqual prepend="and" property="companyType" compareValue="2"><!-- cType: 1 TYD   0 Other -->
+			     		a.`from` = #from# 
+			</isEqual>
+		     	<isEqual prepend="and" property="companyType" compareValue="1"><!-- cType: 1 TYD   0 Other -->
+			     		(a.`from` ='0' or a.`from`='tyd000') 
+			</isEqual>
+		</dynamic>
+	</select>
+	
+	<select id="select_slh_apk_for_assembly" resultMap="ApkImageResult" parameterClass="java.lang.Integer">
+		SELECT
+			a.apk_id,
+			a.apk_name,
+			a.brief_introduction,
+			a.description,
+			a.download_num,
+			a.version_code,
+			a.version_name,
+			a.file_md5,
+			a.file_size,
+			a.package_name,
+			a.file_name,
+			a.download_url,
+			a.local_path,
+			a.png_icon_id,
+			a.jpg_icon_id,
+			a.status,
+			a.mark,
+			a.creator,
+			a.from,
+			a.company_type,
+			a.company,
+			a.create_time,
+			a.modify_time
+		FROM
+			slh_apk a
+		WHERE
+			apk_id = #value#
+	</select>
+	
+	<insert id="insert_slh_apk" parameterClass="Apk" >
+	 INSERT INTO slh_apk(
+		apk_id,
+		apk_name,
+		brief_introduction,
+		download_num,
+		version_code,
+		apk_code,
+		version_name,
+		file_md5,
+		file_size,
+		package_name,
+		file_name,
+		download_url,
+		local_path,
+		png_icon_id,
+		jpg_icon_id,
+		status,
+		mark,
+		creator,
+		description,
+		`from`,
+		company,
+		company_type,
+		create_time,
+		modify_time,
+		is_icon
+	)
+	VALUES
+		(#apkId#, #apkName#, #briefIntroduction#, #downloadNum#,#versionCode#,#apkCode#,#versionName#,#fileMd5#,
+			#fileSize#,#packageName#,#fileName#,#downloadUrl#,#localPath#,#pngIconId#,#jpgIconId#,#status#,#mark#,#creator#,#description#,#from#,#company#,#companyType#,NOW(),NOW(),#isIcon#)
+	  <selectKey resultClass="java.lang.Integer" keyProperty="apkId" >
+	    SELECT LAST_INSERT_ID()
+	  </selectKey>
+	</insert>
+	
+	<update id="update_slh_apk" parameterClass="Apk" >
+	  UPDATE slh_apk SET modify_time = NOW()
+	  <dynamic>
+	    <isNotNull prepend="," property="apkName">
+	      apk_name = #apkName#
+	    </isNotNull>
+	    <isNotNull prepend="," property="company">
+	      company = #company#
+	    </isNotNull>
+	    <isNotNull prepend="," property="downloadNum">
+	      download_num = #downloadNum#
+	    </isNotNull>
+	    <isNotNull prepend="," property="description">
+	      description = #description#
+	    </isNotNull>
+	    <isNotNull prepend="," property="mark">
+	      mark = #mark#
+	    </isNotNull>
+	    <isNotNull prepend="," property="status">
+	      status = #status#
+	    </isNotNull>
+	    <isNotNull prepend="," property="briefIntroduction">
+	      brief_introduction = #briefIntroduction#
+	    </isNotNull>
+	    <isNotNull prepend="," property="versionCode">
+	      version_code = #versionCode#
+	    </isNotNull>
+	    <isNotNull prepend="," property="versionName">
+	      version_name = #versionName#
+	    </isNotNull>
+	    <isNotNull prepend="," property="fileMd5">
+	      file_md5 = #fileMd5#
+	    </isNotNull>
+	     <isNotNull prepend="," property="fileSize">
+	      file_size = #fileSize#
+	    </isNotNull>
+	    <isNotNull prepend="," property="packageName">
+	      package_name = #packageName#
+	    </isNotNull>
+	    <isNotNull prepend="," property="fileName">
+	      file_name = #fileName#
+	    </isNotNull>
+	    <isNotNull prepend="," property="downloadUrl">
+	      download_url = #downloadUrl#
+	    </isNotNull>
+	    <isNotNull prepend="," property="localPath">
+	      local_path = #localPath#
+	    </isNotNull>
+	    <isNotNull prepend="," property="pngIconId">
+	      png_icon_id = #pngIconId#
+	    </isNotNull>
+	    <isNotNull prepend="," property="jpgIconId">
+	      jpg_icon_id = #jpgIconId#
+	    </isNotNull>
+	    
+	  </dynamic>
+	  WHERE apk_id = #apkId#
+	</update>
+	
+	<delete id="delete_slh_apk" parameterClass="Apk">
+		DELETE
+		FROM
+			slh_apk
+		WHERE
+			apk_id = #apkId#
+	</delete>
+	
+	
+	<!--start apkImage图片    -->
+	<typeAlias alias="ApkImage" type="com.yancey.manager.domain.ApkImage" />
+
+	<insert id="insert_slh_apk_image" parameterClass="ApkImage" >
+	  INSERT INTO slh_apk_image(
+		apk_id,
+		image_id,
+		display_seq
+	  )
+	 VALUES
+		(
+			#apkId#, #imageId#, #displaySeq#)
+	</insert>
+	
+	<delete id="delete_slh_apk_image" parameterClass="ApkImage">
+		DELETE
+		FROM
+			slh_apk_image
+		WHERE 1 = 1 
+		<dynamic>
+			 <isNotNull prepend="and" property="apkId">
+			 	apk_id = #apkId#
+			 </isNotNull>
+			 <isNotNull prepend="and" property="imageId">
+			 	image_id = #imageId#
+			 </isNotNull>
+		</dynamic>
+	</delete>
+	<!--end apkImage图片    -->
+	
+	<!--start apkLabel图片    -->
+	<typeAlias alias="ApkLabel" type="com.yancey.manager.domain.ApkLabel" />
+
+	<insert id="insert_slh_apk_label" parameterClass="ApkLabel" >
+	  INSERT INTO slh_apk_label(apk_id, label_id)
+	  VALUES(#apkId#, #labelId#)
+	</insert>
+	<delete id="delete_slh_apk_label" parameterClass="ApkLabel">
+		DELETE
+		FROM
+			slh_apk_label
+		WHERE
+			apk_id = #apkId#
+	</delete>
+	<!--end apkLabel图片    -->
+		
+	<insert id="insertInitPlayCount" parameterClass="Apk">
+		insert into
+		slh_apk_game_data_info
+		(
+		apk_id,
+		apk_name,
+		init_delta_num,
+		create_time,
+		modify_time
+		)
+		values
+		(
+		#apkId#,
+		#apkName#,
+		#downloadNum#,
+		now(),
+		now()
+		)
+	</insert>
+		<update id="updateInitPlayCount" parameterClass="Apk">
+		update 
+		slh_apk_game_data_info
+		set 
+		init_delta_num=#downloadNum#,
+		apk_name=#apkName#
+		where apk_id=#apkId#
+	</update>
+</sqlMap>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_assembly">
+
+	<typeAlias alias="assemblyDomain" type="com.yancey.manager.domain.AssemblyDomain" />
+	
+	<resultMap class="assemblyDomain" id="resultAssemblyMap">
+		<result property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="creator" column="creator"/>
+	    <result property="createTime" column="create_time" />
+	    <result property="modifyTime" column="modify_time" />
+	</resultMap>
+	
+	<sql id="assembly_query_conditions" >
+	    <dynamic>
+	     	<isNotEmpty property="name" prepend="and">
+		     		name like concat('%',#name#,'%') 
+	     	</isNotEmpty>
+	     	<isNotEmpty property="creator" prepend="and">
+		     		creator = #creator#
+	     	</isNotEmpty>
+	    </dynamic>
+	</sql>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="resultAssemblyMap" parameterClass="assemblyDomain">
+		select 
+		id,
+		name,
+		creator,
+		create_time,
+		modify_time
+		from slh_apk_selected_info
+		where 1=1
+		<include refid="assembly_query_conditions"/>
+		order by modify_time desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer" parameterClass="assemblyDomain">
+		select 
+		count(1)
+		from slh_apk_selected_info 
+		where 1=1
+		<include refid="assembly_query_conditions"/>
+	</select>
+		
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_apk_selected_info where id=#id#
+	</delete>	
+		
+	<insert id="INSERT_ENTITY" parameterClass="assemblyDomain">
+		insert into slh_apk_selected_info(name,creator,create_time,modify_time)
+		values (#name#,#creator#,NOW(),NOW())
+	</insert>	
+	
+	<update id="UPDATE_ENTITY" parameterClass="assemblyDomain">
+		update  slh_apk_selected_info set
+		modify_time=NOW()
+		<dynamic>
+			    <isNotEmpty prepend="," property="name">
+			      name = #name#
+			    </isNotEmpty>
+		  </dynamic>
+		where id=#id#
+	</update>
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="resultAssemblyMap" parameterClass="java.lang.Integer">
+		select 
+		id,
+		name,
+		creator,
+		create_time,
+		modify_time
+		from slh_apk_selected_info
+		where id=#id#
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="resultAssemblyMap" parameterClass="assemblyDomain">
+		select 
+		id,
+		name,
+		create_time,
+		modify_time
+		from slh_apk_selected_info
+		where 1=1
+		<dynamic>
+			<isNotEmpty prepend="and" property="id">
+				id &lt;&gt;#id#
+			</isNotEmpty>
+			<isNotEmpty property="name" prepend="and">
+		     		name like concat('%',#name#,'%') 
+	     	</isNotEmpty>
+			<isNotEmpty property="creator" prepend="and">
+		     	creator = #creator#
+	     	</isNotEmpty>
+		</dynamic>
+		order by modify_time desc
+		<isNotEmpty property="pageStatus">
+				LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+		</isNotEmpty>
+	</select>
+	
+		<select id="checkAssembly" resultMap="resultAssemblyMap" parameterClass="assemblyDomain">
+		select 
+		id,
+		name,
+		creator,
+		create_time,
+		modify_time
+		from slh_apk_selected_info
+		where 1=1
+		<dynamic>
+			<isNotEmpty prepend="and" property="id">
+				id &lt;&gt;#id#
+			</isNotEmpty>
+			<isNotEmpty property="name" prepend="and">
+		     	name =#name#
+	     	</isNotEmpty>
+		</dynamic>
+	</select>
+</sqlMap>

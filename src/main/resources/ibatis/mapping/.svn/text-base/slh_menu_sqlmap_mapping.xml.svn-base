@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_menu">
+
+	<typeAlias alias="MenuForm" type="com.yancey.manager.form.MenuForm" />
+	
+	<resultMap id="abatorgenerated_MenuResult" class="MenuForm" >
+	    <result column="resource_id" property="resourceId" />
+	    <result column="resource_name" property="resourceName" />
+	    <result column="permission" property="permission" />
+	    <result column="resource_url" property="resourceUrl" />
+	    <result column="parent" property="parent" />
+	    <result column="display_sort" property="displaySort" />
+	    <result column="display_type" property="displayType" />
+	    <result column="description" property="description" />
+	</resultMap>
+	<resultMap id="select_tree_MenuResult" class="MenuForm" >
+	    <result column="resource_id" property="resourceId" />
+	    <result column="resource_name" property="resourceName" />
+	    <result column="permission" property="permission" />
+	    <result column="resource_url" property="resourceUrl" />
+	    <result column="parent" property="parent" />
+	    <result column="parent_id" property="state" select="slh_menu.FIND_CHILD_STATE"/>
+	    <result column="display_sort" property="displaySort" />
+	    <result column="display_type" property="displayType" />
+	    <result column="description" property="description" />
+	</resultMap>
+	
+	<sql id="slh_resource.abatorgenerated_slh_resource_query_conditions" >
+	    <dynamic>
+	      <isNotNull prepend="and" property="resourceName" >
+	        resource_name = #resourceName#
+	      </isNotNull>
+	      <isNotNull prepend="and" property="permission" >
+	        permission = #permission#
+	      </isNotNull>
+	      <isNotNull prepend="and" property="description" > 
+	        description = #description#
+	      </isNotNull>
+	    </dynamic>
+	</sql>
+
+	<select id="query_slh_count" resultClass="java.lang.Integer"	parameterClass="MenuForm">
+		SELECT COUNT(1) FROM slh_resource
+		WHERE 1 = 1
+		<include refid="slh_resource.abatorgenerated_slh_resource_query_conditions"/>
+	</select>
+	<select id="FIND_CHILD_STATE" resultClass="java.lang.String" parameterClass="java.lang.Integer">
+		SELECT COUNT(1) FROM slh_resource
+		WHERE parent = #parent_id#
+	</select>
+	<select id="select_slh_model_page_list" resultMap="select_tree_MenuResult" parameterClass="MenuForm">
+		SELECT resource_id,resource_id as parent_id ,resource_name, permission,resource_url,parent,display_sort, display_type,description
+		FROM slh_resource
+		WHERE parent = #parent#
+		<include refid="slh_resource.abatorgenerated_slh_resource_query_conditions"/>
+	</select>
+	
+	<select id="select_children_by_parent_id" resultMap="abatorgenerated_MenuResult" parameterClass="MenuForm">
+		<dynamic>
+			<isNotEmpty property="value">
+				SELECT resource_id, resource_name, permission,resource_url,parent,display_sort, display_type,description
+				FROM slh_resource
+				WHERE parent = #parent#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	
+	<select id="select_slh_model_list" resultMap="abatorgenerated_MenuResult" parameterClass="MenuForm">
+				SELECT resource_id, resource_name, permission,resource_url,parent,display_sort, display_type,description
+				FROM slh_resource
+				WHERE 1= 1
+				<include refid="slh_resource.abatorgenerated_slh_resource_query_conditions"/>
+	</select>
+	
+	<select id="select_slh_model" resultMap="abatorgenerated_MenuResult" parameterClass="MenuForm">
+		SELECT resource_id, resource_name, permission,resource_url,parent, display_sort, display_type, description
+		FROM slh_resource
+		WHERE 1 = 1
+		<include refid="slh_resource.abatorgenerated_slh_resource_query_conditions"/>
+		<dynamic>
+			<isNotNull prepend="and" property="resourceId">
+				resource_id = #resourceId#
+			</isNotNull>
+		</dynamic>
+	</select>
+	<select id="select_slh_model_by_name" resultMap="abatorgenerated_MenuResult" parameterClass="MenuForm">
+		SELECT resource_id, resource_name, permission,resource_url,parent,  display_sort, display_type, description
+		FROM slh_resource
+		WHERE 1 = 1
+		<include refid="slh_resource.abatorgenerated_slh_resource_query_conditions"/>
+		<dynamic>
+			<isNotNull prepend="and" property="resourceName">
+				resource_name = #resourceName#
+			</isNotNull>
+		</dynamic>
+	</select>
+	
+	<insert id="insert_slh_model" parameterClass="MenuForm" >
+	  INSERT INTO slh_resource ( resource_name, permission,resource_url,parent,display_sort, display_type, description, create_time, modify_time)
+	  VALUES (#resourceName#, #permission#, #resourceUrl#,#parent#,#displaySort#,#displayType#,#description#, NOW(), NOW())
+	  <selectKey resultClass="java.lang.Integer" keyProperty="resourceId" >
+	    SELECT LAST_INSERT_ID()
+	  </selectKey>
+	</insert>
+	
+	<update id="update_slh_model" parameterClass="MenuForm" >
+	  UPDATE slh_resource SET modify_time = NOW()
+	  <dynamic>
+	    <isNotNull prepend="," property="resourceName">
+	      resource_name = #resourceName#
+	    </isNotNull>
+	    <isNotNull prepend="," property="permission">
+	      permission = #permission#
+	    </isNotNull>
+	    <isNotNull prepend="," property="description">
+	      description = #description#
+	    </isNotNull>
+	    <isNotNull prepend="," property="resourceUrl">
+	      resource_url = #resourceUrl#
+	    </isNotNull>
+	    <isNotNull prepend="," property="displaySort">
+	    	display_sort = #displaySort#
+	    </isNotNull>
+	  </dynamic>
+	  WHERE resource_id = #resourceId#
+	</update>
+	
+	<delete id="delete_slh_model" parameterClass="MenuForm">
+		delete from slh_resource where resource_id = #resourceId#
+	</delete>
+		
+</sqlMap>

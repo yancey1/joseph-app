@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans 
+    xmlns="http://www.springframework.org/schema/beans"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"    	
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/aop 
+            http://www.springframework.org/schema/aop/spring-aop-2.0.xsd	
+		 	http://www.springframework.org/schema/tx 
+			http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+			http://www.springframework.org/schema/context
+		    http://www.springframework.org/schema/context/spring-context-3.0.xsd           
+            " default-autowire="byName">
+
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:config.properties</value>
+				<value>classpath:jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+    <!-- 系统日志AOP配置 -->
+	<aop:aspectj-autoproxy/>   
+	<bean id="logAspect" class="com.yancey.manager.aop.LogAspect">
+	    <property name="systemLogService" ref="systemLogService"/>
+	</bean>    
+	<aop:config>  
+        <aop:aspect ref="logAspect">  
+            <aop:pointcut id="logPointCut" expression="execution(* com.yancey.manager.service.impl.*.*(..))"/>  
+            <aop:around pointcut-ref="logPointCut" method="doSystemLog"/>  
+           <aop:before pointcut-ref="logPointCut" method="doSystemBefore"/>
+        </aop:aspect>  
+	</aop:config>  	
+	
+</beans>

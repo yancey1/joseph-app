@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_lockscreenRef">
+
+	<typeAlias alias="lockscreenRef" type="com.yancey.manager.domain.LockScreenRefDomain" />
+	
+	<resultMap id="lockscreenRefResult" class="lockscreenRef" >
+	    <result column="lid" property="lid" />
+	    <result column="rid" property="rid" />
+	    <result column="type" property="type" />
+	    <result column="order_num" property="orderNum" />
+	    <result column="rid" property="weather" select="slh_weather.selectByCid" />
+	    <result column="rid" property="joke" select="slh_joke.selectByCid" />
+	    <result column="rid" property="news" select="slh_news_info.selectByCid" />
+	</resultMap>
+	
+	<sql id="slh_lockscreen_ref_query-conditions" >
+	    <dynamic>
+	      <isNotEmpty prepend="and" property="lid" >
+	        lid like concat('%',#lid#,'%') 
+	      </isNotEmpty>
+	       <isNotEmpty prepend="and" property="rid" >
+	        rid like concat('%',#rid#,'%') 
+	      </isNotEmpty>
+	       <isNotEmpty prepend="and" property="type" >
+	        type like concat('%',#type#,'%') 
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="lockscreenRef">
+		SELECT COUNT(1) FROM slh_lock_screen_ref_mapping a WHERE 1 = 1 
+		<include refid="slh_lockscreen_ref_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="lockscreenRefResult" parameterClass="lockscreenRef">
+		SELECT 
+		lid,
+		rid,
+		type,
+		order_num
+		FROM slh_lock_screen_ref_mapping
+		WHERE 1 = 1 
+		<include refid="slh_lockscreen_ref_query-conditions"/>
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="lockscreenRefResult" parameterClass="lockscreenRef">
+		SELECT 
+		lid,
+		rid,
+		type,
+		order_num
+		FROM slh_lock_screen_ref_mapping
+		WHERE 1 = 1 
+		ORDER BY order_num
+	</select>
+	
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="lockscreenRefResult" parameterClass="java.lang.Integer">
+		SELECT 
+		lid,
+		rid,
+		type,
+		order_num
+		FROM slh_lock_screen_ref_mapping
+		WHERE lid=#id#
+	</select>
+	
+	<insert id="INSERT_ENTITY" parameterClass="lockscreenRef" >
+		INSERT INTO slh_lock_screen_ref_mapping(lid,
+		rid,
+		type,
+		order_num)
+	 	VALUES(#lid#,#rid#,#type#, #orderNum#)
+		
+	</insert>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_lock_screen_ref_mapping where lid = #id#
+	</delete>
+	
+	<select id="GET_DELEPLOY_ENTITY_LIST" resultMap="lockscreenRefResult" parameterClass="lockscreenRef">
+		SELECT 
+		lid,
+		rid,
+		type,
+		order_num
+		FROM slh_lock_screen_ref_mapping
+		WHERE 1 = 1 
+		<dynamic>
+			<isNotEmpty prepend="and" property="rid">
+				rid=#rid#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="type">
+				type=#type#
+			</isNotEmpty>
+			
+		</dynamic>
+	</select>
+</sqlMap>

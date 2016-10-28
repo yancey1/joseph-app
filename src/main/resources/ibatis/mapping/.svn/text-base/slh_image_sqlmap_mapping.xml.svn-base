@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_image">
+
+	<typeAlias alias="Image" type="com.yancey.manager.domain.Image" />
+	
+	<resultMap id="imageResult" class="Image" >
+	    <result column="image_id" property="imageId" />
+	    <result column="image_name" property="imageName" />
+	    <result column="image_type" property="imageType" />
+	    <result column="image_width" property="imageWidth" />
+	    <result column="image_height" property="imageHeight" />
+	    <result column="hd_image_url" property="hdImageUrl" />
+	    <result column="nhd_image_url" property="nhdImageUrl" />
+	    <result column="small_image_url" property="smallImageUrl"/>
+	    <result column="md5" property="md5" />
+	    <result column="status" property="status" />
+	    <result column="creator" property="creator" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	</resultMap>
+	<sql id="abatorgenerated_slh_image_query_conditions" >
+	    <dynamic>
+		  <isNotEmpty property="imageName" prepend="and" >
+		       image_name like '%$imageName$%'
+		  </isNotEmpty>
+		  <isNotEmpty property="imageType" prepend="and" >
+		        image_type = #imageType#
+	      </isNotEmpty>
+	      <isNotEmpty property="status" prepend="and" >
+		        status = #status#
+	      </isNotEmpty>
+	      <isNotEmpty property="imageId" prepend="and" >
+		        image_id = #imageId#
+	      </isNotEmpty>
+	      <isNotEmpty property="imageList" prepend="and" >
+	      	<iterate prepend="image_type in" property="imageList" open="(" close=")" conjunction=",">
+	      		#imageList[]#
+	      	</iterate>
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+	<select id="select_slh_image_list" resultMap="imageResult" parameterClass="Image">
+		SELECT image_id, image_name, image_type, image_width, image_height, hd_image_url, nhd_image_url,small_image_url, md5, status, creator, create_time, modify_time
+		FROM slh_image
+		WHERE 1=1
+		<include refid="slh_image.abatorgenerated_slh_image_query_conditions"/>
+		ORDER BY modify_time DESC
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows#
+	</select>
+	<select id="select_slh_image" resultMap="imageResult" parameterClass="Image">
+		SELECT image_id, image_name, image_type, image_width, image_height, hd_image_url, nhd_image_url,small_image_url, md5, status, creator, create_time, modify_time
+		FROM slh_image
+		WHERE 1=1
+		<include refid="slh_image.abatorgenerated_slh_image_query_conditions"/>
+	</select>
+	<select id="select_slh_image_by_id" resultMap="imageResult" parameterClass="Image">
+		SELECT image_id, image_name, image_type, image_width, image_height, hd_image_url, nhd_image_url,small_image_url, md5, status, creator, create_time, modify_time
+		FROM slh_image
+		WHERE 1=1
+		<dynamic>
+		  <isNotEmpty property="imageId" >
+		    <isNotNull prepend="and" property="imageId" >
+		       image_id = #imageId#
+		    </isNotNull>
+		  </isNotEmpty>
+	    </dynamic>
+	</select>
+	
+	<insert id="insert_slh_image" parameterClass="Image" >
+	  	insert into slh_image 
+	  		(image_name, image_type, image_width, image_height, hd_image_url, nhd_image_url,small_image_url, md5, status, creator, create_time, modify_time)
+	    values
+	    	(#imageName#, #imageType#, #imageWidth#, #imageHeight#, #hdImageUrl#, #nhdImageUrl#,#smallImageUrl#, #md5#, #status#, #creator#, NOW(), NOW())
+	    <selectKey keyProperty="imageId" resultClass="java.lang.Integer">
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+	
+	<update id="update_slh_image" parameterClass="Image" >
+	  UPDATE slh_image SET modify_time = NOW()
+	  <dynamic>
+	    <isNotNull prepend="," property="imageName">
+	      image_name = #imageName#
+	    </isNotNull>
+	    <isNotNull prepend="," property="imageType">
+	      image_type = #imageType#
+	    </isNotNull>
+	     <isNotNull prepend="," property="imageWidth">
+	      image_width = #imageWidth#
+	    </isNotNull>
+	     <isNotNull prepend="," property="imageHeight">
+	      image_height = #imageHeight#
+	    </isNotNull>
+	     <isNotNull prepend="," property="hdImageUrl">
+	      hd_image_url = #hdImageUrl#
+	    </isNotNull>
+	    <isNotNull prepend="," property="nhdImageUrl">
+	      nhd_image_url = #nhdImageUrl#
+	    </isNotNull>
+	     <isNotNull prepend="," property="smallImageUrl">
+	      small_image_url = #smallImageUrl#
+	    </isNotNull>
+	     <isNotNull prepend="," property="md5">
+	      md5 = #md5#
+	    </isNotNull>
+	     <isNotNull prepend="," property="status">
+	      status = #status#
+	    </isNotNull>
+	  </dynamic>
+	  WHERE image_id = #imageId#
+	</update>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="imageResult" parameterClass="Image">
+		SELECT 
+		image_id, 
+		image_name, 
+		image_type,
+		image_width,
+		image_height,
+		hd_image_url, 
+		nhd_image_url,
+		small_image_url,
+		md5, status, 
+		creator, 
+		create_time, 
+		modify_time
+		FROM slh_image
+		WHERE status=1
+		<dynamic>
+			<isNotEmpty prepend="and" property="imageName">
+				image_name like concat('%',#imageName#,'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="imageType">
+				image_type=#imageType#
+			</isNotEmpty>
+			<isNotEmpty property="pageInfo">
+				LIMIT #pageInfo.currentRow#, #pageInfo.rows#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="selectImageByRefId" resultMap="imageResult" parameterClass="java.lang.Integer">
+		SELECT image_id,
+		 image_name, 
+		 image_type, 
+		 image_width, 
+		 image_height,
+		 hd_image_url, 
+		 nhd_image_url,
+		 small_image_url,
+		 md5,
+		 status,
+		 creator,
+		 create_time,
+		 modify_time
+		 FROM slh_image
+		 WHERE 
+		 image_id = #value#
+	</select>	
+	
+	<select id="select_slh_image_for_id" resultMap="imageResult" parameterClass="java.lang.Integer">
+		SELECT image_id, image_name, image_type, image_width, image_height, hd_image_url, nhd_image_url,small_image_url, md5, status, creator, create_time, modify_time
+		FROM slh_image
+		WHERE 1=1 and 
+			image_id = #value#
+	</select>
+		
+</sqlMap>

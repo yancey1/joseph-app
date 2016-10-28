@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_type_data">
+
+	<typeAlias alias="typeData" type="com.yancey.manager.domain.TypeData" />
+	
+	<resultMap class="typeData" id="typeDataMap">
+		<result property="bizDate" column="biz_date"/>
+		<result property="channelId" column="channel_id"/>
+		<result property="bizAppId" column="biz_app_id"/>
+		<result property="refType" column="ref_type"/>
+		<result property="showPv" column="show_pv"/>
+		<result property="showUv" column="show_uv"/>
+		<result property="createTime" column="create_time"/>
+	</resultMap>
+	
+	<sql id="type_data_query_conditions" >
+	     <dynamic>
+	     		<isEqual property="refType" compareValue="0" > 
+		     		<isNotEmpty prepend="and" property="startDate">
+			    				<![CDATA[
+			    				biz_date >= #startDate#
+			    			]]>
+			    	</isNotEmpty>
+			    	<isNotEmpty prepend="and" property="endDate">
+			    			<![CDATA[
+			    				biz_date <= #endDate#
+			    			]]>
+			    	</isNotEmpty>
+			     	<isNotEmpty property="channelId" prepend="and">
+				     		channel_id =#channelId# 
+			     	</isNotEmpty>
+			     	<isNotEmpty property="bizAppId" prepend="and">
+				     		biz_app_id = #bizAppId#
+			     	</isNotEmpty>
+		     	</isEqual>
+	     	<isNotEqual property="refType" compareValue="0" > 
+		     		<isNotEmpty prepend="and" property="startDate">
+			    				<![CDATA[
+			    				biz_date >= #startDate#
+			    			]]>
+			    	</isNotEmpty>
+			    	<isNotEmpty prepend="and" property="endDate">
+			    			<![CDATA[
+			    				biz_date <= #endDate#
+			    			]]>
+			    	</isNotEmpty>
+			     	<isNotEmpty property="channelId" prepend="and">
+				     		channel_id =#channelId# 
+			     	</isNotEmpty>
+			     	<isNotEmpty property="bizAppId" prepend="and">
+				     		biz_app_id = #bizAppId#
+			     	</isNotEmpty>
+			     	<isNotEmpty property="refType" prepend="and">
+				     		ref_type = #refType#
+			     	</isNotEmpty>
+		     </isNotEqual>
+	    	
+	    </dynamic>
+	</sql>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="typeDataMap" parameterClass="typeData">
+		select 
+			biz_date,
+			channel_id,
+			biz_app_id,
+			ref_type,
+			show_pv,
+			show_uv,
+			create_time
+		from slh_lock_screen_warehourse.slh_type_data_show
+		where 1=1 and ref_type not in(7,8,99)
+		<include refid="type_data_query_conditions"/>
+		order by biz_date desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="typeDataMap" parameterClass="typeData">
+		select 
+			biz_date,
+			channel_id,
+			biz_app_id,
+			ref_type,
+			show_pv,
+			show_uv,
+			create_time 
+		from slh_lock_screen_warehourse.slh_type_data_show
+		where 1=1  and ref_type not in(7,8,99)
+		<include refid="type_data_query_conditions"/>
+		order by create_time desc
+	</select>
+	
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer" parameterClass="typeData">
+		select 
+		count(1)
+		from slh_lock_screen_warehourse.slh_type_data_show
+		where 1=1  and ref_type not in(7,8,99)
+		<include refid="type_data_query_conditions"/>
+	</select>
+</sqlMap>

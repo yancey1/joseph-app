@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_lock_screen_pvuv_data">
+
+	<typeAlias alias="lockScreenPvUvData" type="com.yancey.manager.domain.LockScreenPvUvData" />
+	
+	<resultMap class="lockScreenPvUvData" id="lockScreenPvUvDataMap">
+		<result property="bizDate" column="biz_date"/>
+		<result property="bizAppId" column="biz_app_id"/>
+		<result property="channelId" column="channel_id"/>
+		<result property="operOpenPv" column="oper_open_pv"/>
+		<result property="operOpenUv" column="oper_open_uv"/>
+		<result property="autOpenPv" column="aut_open_pv"/>
+		<result property="autOpenUv" column="aut_open_uv"/>
+		<result property="closePv" column="close_pv"/>
+		<result property="closeUv" column="close_uv"/>
+		<result property="createTime" column="create_time"/>
+	</resultMap>
+	
+	<sql id="lock_screen_data_query_conditions" >
+	     <dynamic>
+	    	<isNotEmpty prepend="and" property="startDate">
+	    			<![CDATA[
+	    				biz_date >= #startDate#
+	    			]]>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="endDate">
+	    			<![CDATA[
+	    				biz_date <= #endDate#
+	    			]]>
+	    	</isNotEmpty>
+	     	<isNotEmpty property="channelId" prepend="and">
+		     		channel_id =#channelId# 
+	     	</isNotEmpty>
+	     	<isNotEmpty property="bizAppId" prepend="and">
+		     		biz_app_id =#bizAppId# 
+	     	</isNotEmpty>
+	    </dynamic>
+	</sql>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="lockScreenPvUvDataMap" parameterClass="lockScreenPvUvData">
+		select 
+			biz_date,
+			biz_app_id,
+			channel_id,
+			oper_open_pv,
+			oper_open_uv,
+			aut_open_pv,
+			aut_open_uv,
+			close_pv,
+			close_uv,
+			create_time
+		from slh_lock_screen_warehourse.slh_lock_screen_pvuv_data 
+		where 1=1
+		<include refid="lock_screen_data_query_conditions"/>
+		order by biz_date desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer" parameterClass="lockScreenPvUvData">
+		select 
+		count(1)
+		from slh_lock_screen_warehourse.slh_lock_screen_pvuv_data
+		where 1=1
+		<include refid="lock_screen_data_query_conditions"/>
+	</select>
+	
+	<select id="select_slh_lock_screen_data_list" resultMap="lockScreenPvUvDataMap" parameterClass="lockScreenPvUvData">
+		select 
+			biz_date,
+			biz_app_id,
+			channel_id,
+			oper_open_pv,
+			oper_open_uv,
+			aut_open_pv,
+			aut_open_uv,
+			close_pv,
+			close_uv,
+			create_time
+		from slh_lock_screen_warehourse.slh_lock_screen_pvuv_data 
+		where 1=1
+		<include refid="lock_screen_data_query_conditions"/>
+		order by biz_date desc
+	</select>
+	
+</sqlMap>

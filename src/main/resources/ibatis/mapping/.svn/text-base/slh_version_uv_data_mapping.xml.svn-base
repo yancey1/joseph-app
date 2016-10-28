@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_version_uv_data">
+
+	<typeAlias alias="versionUVData" type="com.yancey.manager.domain.VersionUVData" />
+	
+	<resultMap class="versionUVData" id="versionUVDataMap">
+		<result property="bizDate" column="biz_date"/>
+		<result property="channelId" column="channel_id"/>
+		<result property="apkVerName" column="apk_ver_name"/>
+		<result property="visitUV" column="visit_uv"/>
+		<result property="createTime" column="create_time"/>
+	</resultMap>
+	
+	<sql id="version_uv_data_query_conditions" >
+	     <dynamic>
+	    	<isNotEmpty prepend="and" property="startDate">
+	    			<![CDATA[
+	    				biz_date >= #startDate#
+	    			]]>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="endDate">
+	    			<![CDATA[
+	    				biz_date <= #endDate#
+	    			]]>
+	    	</isNotEmpty>
+	     	<isNotEmpty property="channelId" prepend="and">
+		     		channel_id =#channelId# 
+	     	</isNotEmpty>
+	    </dynamic>
+	</sql>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="versionUVDataMap" parameterClass="versionUVData">
+		select 
+			biz_date,
+			channel_id,
+			apk_ver_name,
+			visit_uv,
+			create_time
+		from slh_lock_screen_warehourse.slh_version_uv_data
+		where 1=1
+		<include refid="version_uv_data_query_conditions"/>
+		order by biz_date desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="versionUVDataMap" parameterClass="versionUVData">
+		select 
+			biz_date,
+			channel_id,
+			apk_ver_name,
+			visit_uv,
+			create_time
+			from slh_lock_screen_warehourse.slh_version_uv_data
+		where 1=1
+		<isNotEmpty prepend="and" property="startDate">
+			biz_date &gt;= #startDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endDate">
+			biz_date &lt;= #endDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="channelId">
+			channel_id = #channelId#
+		</isNotEmpty>
+		order by create_time desc
+	</select>
+	
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer" parameterClass="versionUVData">
+		select 
+		count(1)
+		from slh_lock_screen_warehourse.slh_version_uv_data
+		where 1=1
+		<include refid="version_uv_data_query_conditions"/>
+	</select>
+	
+	
+	
+	
+	
+	<select id="select_slh_versionUVData_list" resultMap="versionUVDataMap" parameterClass="versionUVData">
+		select 
+			biz_date,
+			channel_id,
+			apk_ver_name,
+			visit_uv,
+			create_time
+			from slh_lock_screen_warehourse.slh_version_uv_data
+		where 1=1
+		<include refid="version_uv_data_query_conditions"/>
+		order by biz_date desc
+	</select>
+</sqlMap>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_assembly_apk_mapping">
+
+	<typeAlias alias="assemblyApkDomain" type="com.yancey.manager.domain.AssemblyApkDomain" />
+	
+	<resultMap class="assemblyApkDomain" id="resultAssemblyApkMap">
+		<result property="sid" column="sid"/>
+		<result property="gid" column="gid"/>
+		<result property="orderNum" column="order_num"/>
+		<result property="apk" column="gid" select="slh_apk.select_slh_apk_for_assembly"/>
+	</resultMap>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="resultAssemblyApkMap" parameterClass="assemblyApkDomain">
+		select 
+			sid,
+			gid,
+			order_num
+		from slh_apk_selected_mapping
+		where 1=1
+		<dynamic>
+			<isNotEmpty prepend="and" property="sid">
+				sid=#sid#
+			</isNotEmpty>
+		</dynamic>
+		order by order_num
+	</select>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_apk_selected_mapping where sid=#id#
+	</delete>	
+		
+	<insert id="INSERT_ENTITY" parameterClass="assemblyApkDomain">
+		insert into slh_apk_selected_mapping(sid,gid,order_num)
+		values (#sid#,#gid#,#orderNum#)
+	</insert>	
+	
+	<delete id="deleteEntityAll" parameterClass="assemblyApkDomain">
+		delete from slh_apk_selected_mapping where gid=#gid#
+	</delete>	
+	
+	<select id="SELECT_ENTITY_LIST" resultClass="assemblyApkDomain" parameterClass="assemblyApkDomain">
+		SELECT
+			m.order_num,
+			s.`name`,
+			a.apk_id,
+			a.apk_name,
+			a.brief_introduction,
+			a.description,
+			a.download_url,
+			a.download_num
+		FROM
+			slh_apk_selected_mapping m,
+			slh_apk_selected_info s,
+			slh_apk a
+		WHERE
+			m.sid = s.id
+		AND m.gid = a.apk_id
+		<dynamic>
+			<isNotEmpty prepend="and" property="apkName">
+				a.apk_name like concat('%',#apkName#,'%')
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="select_entity_by_getid" resultClass="assemblyApkDomain" parameterClass="assemblyApkDomain">
+		SELECT
+			sid,
+			gid,
+			order_num
+		FROM
+			slh_apk_selected_mapping 
+		WHERE 1=1 
+		<dynamic>
+			<isNotEmpty prepend="and" property="gid">
+				gid=#gid#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+</sqlMap>

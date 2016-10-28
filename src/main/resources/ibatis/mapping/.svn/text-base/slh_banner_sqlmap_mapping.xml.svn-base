@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_banner">
+
+	<typeAlias alias="bannerDomain" type="com.yancey.manager.domain.BannerDomain" />
+	<typeAlias alias="bannerMappingDomain" type="com.yancey.manager.domain.BannerMappingDomain" />
+	
+	<resultMap id="bannerResult" class="bannerDomain" >
+	    <result column="banner_id" property="bannerId" />
+	    <result column="banner_name" property="bannerName" />
+	    <result column="image_id" property="imageId" />
+	    <result column="order_num" property="orderNum" />
+	    <result column="remarks" property="remarks" />
+	    <result column="create_time" property="createTime" />
+		<result column="modify_time" property="modifyTime" />
+	    <result column="image_id" property="image" select="slh_image.selectImageByRefId" />
+	</resultMap>
+	
+	<sql id="slh_banner_query_conditions" >
+	    <dynamic>
+	      <isNotEmpty prepend="and" property="bannerName" >
+	        banner_name like concat('%',#bannerName#,'%') 
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer" parameterClass="bannerDomain">
+		SELECT COUNT(1) FROM slh_banner_info a WHERE 1 = 1 
+		<include refid="slh_banner_query_conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="bannerResult" parameterClass="bannerDomain">
+		SELECT 
+		banner_id,
+		banner_name,
+		image_id,
+		order_num,
+		remarks,
+		create_time,
+		modify_time
+		FROM slh_banner_info
+		WHERE 1 = 1 
+		<include refid="slh_banner_query_conditions"/>
+		ORDER BY order_num 
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="bannerResult" parameterClass="bannerDomain">
+		SELECT 
+		banner_id,
+		banner_name,
+		image_id,
+		order_num,
+		remarks,
+		create_time,
+		modify_time
+		FROM slh_banner_info
+		WHERE 1 = 1 
+		<dynamic>
+			<isNotEmpty prepend="and" property="bannerName">
+				banner_name=#bannerName#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="bannerId">
+				banner_id &lt;&gt;#bannerId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="bannerResult" parameterClass="java.lang.Integer">
+		SELECT 
+		banner_id,
+		banner_name,
+		image_id,
+		order_num,
+		remarks,
+		create_time,
+		modify_time
+		FROM slh_banner_info
+		WHERE banner_id=#id#
+	</select>
+	
+	<insert id="INSERT_ENTITY" parameterClass="bannerDomain" >
+		INSERT INTO slh_banner_info(banner_name,image_id,order_num,remarks,create_time, modify_time)
+	 	VALUES(#bannerName#,#imageId#,#orderNum#,#remarks#,NOW(), NOW())
+	</insert>
+	
+	<update id="UPDATE_ENTITY" parameterClass="bannerDomain" >
+	  UPDATE slh_banner_info SET modify_time = NOW()
+	  <dynamic>
+	    <isNotEmpty prepend="," property="bannerName">
+	      banner_name = #bannerName#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="imageId">
+	      image_id = #imageId#
+	    </isNotEmpty>
+	      <isNotEmpty prepend="," property="orderNum">
+	      order_num = #orderNum#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="remarks">
+	      remarks = #remarks#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE banner_id = #bannerId#
+	</update>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_banner_info where banner_id = #id#
+	</delete>
+	
+	<select id="selectBannerRefMappiing" resultClass="bannerMappingDomain" parameterClass="java.util.Map">
+		SELECT 
+		banner_id as bannerId,
+		assembly_type as assemblyType,
+		apk_id as apkId,
+		order_num as orderNum
+		FROM slh_banner_ref_mapping
+		WHERE 
+		banner_id=#bannerId#
+		order by order_num
+	</select>
+	
+	<select id="selectBannerAssemblyApkMappiing" resultClass="bannerMappingDomain" parameterClass="java.util.Map">
+		SELECT 
+		banner_id as bannerId,
+		assembly_type as assemblyType,
+		apk_id as apkId,
+		order_num as orderNum
+		FROM slh_banner_assembly_apk_mappping
+		WHERE 
+		banner_id=#bannerId#
+		and
+		assembly_type=#refType#
+		order by order_num
+	</select>
+	
+	<delete id="deleteBannerRefById" parameterClass="java.lang.Integer">
+		delete from slh_banner_ref_mapping where banner_id=#bannerId#
+	</delete>
+	
+	<delete id="deleteBannerAssemblyApkById" parameterClass="bannerMappingDomain">
+		delete from slh_banner_assembly_apk_mappping 
+		where
+	    banner_id=#bannerId#
+	    and
+	    assembly_type=#refType#
+	</delete>
+	
+	<insert id="saveBannerRef" parameterClass="bannerMappingDomain">
+		insert into slh_banner_ref_mapping 
+		(banner_id,assembly_type,apk_id,order_num) 
+		values 
+		(#bannerId#,#refType#,#apkId#,#orderNum#)
+	</insert>
+	
+	<insert id="saveBannerAssemblyApkById" parameterClass="bannerMappingDomain">
+		insert into slh_banner_assembly_apk_mappping 
+		(banner_id,assembly_type,apk_id,order_num) 
+		values 
+		(#bannerId#,#refType#,#apkId#,#orderNum#)
+	</insert>
+	
+	<select id="getMaxOrderNum" resultClass="java.lang.Integer">
+		select
+		ifnull(max(order_num),0)
+		from 
+		slh_banner_info
+	</select>
+	
+	<update id="modifyOrderNumBySave" parameterClass="java.util.Map">
+		update slh_banner_info set order_num=order_num+1
+		where 
+		order_num &gt;=#oldOrder#
+	</update>
+	
+	<update id="modifyMaxOrderNum" parameterClass="java.util.Map">
+		update slh_banner_info set order_num=order_num-1
+		where 
+		order_num &gt;#oldOrder#
+		and
+		order_num &lt;=#newOrder#
+	</update>
+	
+	<update id="modifyMinOrderNum" parameterClass="java.util.Map">
+		update slh_banner_info set order_num=order_num+1
+		where 
+		order_num &lt;#oldOrder#
+		and
+		order_num &gt;=#newOrder#
+	</update>
+	
+	<update id="modifyOrderNumByDelete" parameterClass="java.util.Map">
+		update slh_banner_info set order_num=order_num-1
+		where
+		order_num &gt;#num#
+	</update>
+</sqlMap>

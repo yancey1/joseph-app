@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd" default-autowire="byName">
+
+	<!-- start: 账号管理 -->
+	<bean id="userDAO" parent="baseDAO"
+		class="com.yancey.manager.dao.impl.UserDAOImpl">
+	</bean>
+	<!-- end: 账号管理 -->
+
+	<!-- start 角色管理 -->
+	<bean id="roleDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.RoleDAOImpl">
+	</bean>
+	<!-- end 角色管理 -->
+	
+	<bean id="menuDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.MenuDAOImpl">
+	</bean>
+	
+	<!-- start 图片管理 -->
+	<bean id="imageDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.ImageDAOImpl">
+	</bean>
+	<!-- end 图片管理 -->
+
+	<!-- start 应用管理-->
+	<bean id="apkDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.ApkDAOImpl">
+	</bean>
+	<!-- end 应用管理 -->
+	
+	
+	<bean id="baseCmpCommonDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.BaseCmpCommonDAOImpl">
+	</bean>	
+	
+	<bean id="consuleRefDao" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.ConsultRefDAOImpl">
+	</bean>	
+	
+	<!-- start 天气管理 -->
+	<bean id="weatherDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.WeatherDAOImpl">
+	</bean>
+	
+	<bean id="lockScreenDao" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.LockScreenDAOImpl">
+	</bean>
+	
+	<bean id="wallPaperDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.WallPaperDAOImpl">
+	</bean>
+	
+	<bean id="pushThemeDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.PushThemeDAOImpl">
+	</bean>
+	
+	<bean id="lockScreenSwitchDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.LockScreenSwitchDAOImpl">
+	</bean>
+	
+	<bean id="gameDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.GameDataDAOImpl">
+	</bean>
+	
+	<bean id="assemblyApkDao" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.AssemblyApkDaoImpl">
+	</bean>
+	
+	<bean id="pageGameDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.PageGameDAOImpl">
+	</bean>
+	
+	<bean id="pageGameClassifyDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.PageGameClassifyDAOImpl">
+	</bean>
+	<bean id="pageGameClassifyMappDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.PageGameClassifyMappDAOImpl">
+	</bean>
+	
+	<bean id="typePvUvDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.TypePvUvDataDAOImpl">
+	</bean>
+	
+	<bean id="totalDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.TotalDataDAOImpl">
+	</bean>
+	
+	<bean id="userRemainDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.UserRemainDAOImpl">
+	</bean>
+	
+	<bean id="userRemainSumDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.UserRemainSumDAOImpl">
+	</bean>
+	
+	<bean id="remainDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.RemainDataDAOImpl">
+	</bean>
+	
+	<bean id="remainSumDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.RemainSumDAOImpl">
+	</bean>
+	
+	<bean id="versionDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.VersionDataDAOImpl">
+	</bean>
+	
+	<bean id="versionUVDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.VersionUVDataDAOImpl">
+	</bean>
+	
+	<bean id="leftSlipDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.LeftSlipDataDAOImpl">
+	</bean>
+	
+	<bean id="playGameDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.PlayGameDataDAOImpl">
+	</bean>
+	
+	<bean id="recommendDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.RecommendDAOImpl">
+	</bean>
+	
+	<bean id="chooseLikeDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.ChooseLikeDataDAOImpl">
+	</bean>
+	
+	<bean id="apkDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.ApkDataDAOImpl">
+	</bean>
+	
+	<bean id="gameNavDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.GameNavDataDAOImpl">
+	</bean>
+	
+	<bean id="pageGamePvuvDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.PageGamePvUvDataDAOImpl">
+	</bean>
+	
+	<bean id="lockScreenPvuvDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.LockScreenPvUvDataDAOImpl">
+	</bean>
+	
+	<bean id="searchPvuvDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.SearchPvUvDataDAOImpl">
+	</bean>
+	
+	<bean id="collectionDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.CollectionDataDAOImpl">
+	</bean>
+	
+	<bean id="jokeDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.JokeDataDAOImpl">
+	</bean>
+	
+	<bean id="newsDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.NewsDataDAOImpl">
+	</bean>
+	
+	<bean id="cartoonDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.CartoonDataDAOImpl">
+	</bean>
+	
+	<bean id="wallPaperPvUvDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.WallPaperPvUvDataDAOImpl">
+	</bean>
+	
+	<bean id="wallPaperDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.WallPaperDataDAOImpl">
+	</bean>
+	
+	<bean id="registerDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.RegisterDataDAOImpl">
+	</bean>
+	
+	<bean id="loginDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.LoginDataDAOImpl">
+	</bean>
+	
+	<bean id="strategyDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.StrategyDataDAOImpl">
+	</bean>
+	
+	<bean id="inforDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.InforDataDAOImpl">
+	</bean>
+	
+	<bean id="interactDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.InteractDataDAOImpl">
+	</bean>
+	
+	<bean id="activityDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.ActivityDataDAOImpl">
+	</bean>
+	
+	<bean id="incomeDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.IncomeDataDAOImpl">
+	</bean>
+	
+	<bean id="payDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.PayDataDAOImpl">
+	</bean>
+	
+	
+	<bean id="balanceDataDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.BalanceDataDAOImpl">
+	</bean>
+	<bean id="lotteryDrawActivityDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.LotteryDrawActivityDAOImpl">
+	</bean>
+	
+	<bean id="prizeDomainDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.PrizeDomainDAOImpl">
+	</bean>
+	<bean id="strategyDAO" parent="baseDAO"
+			class="com.yancey.manager.dao.impl.StrategyDAOImpl">
+	</bean>
+	
+	
+
+</beans>

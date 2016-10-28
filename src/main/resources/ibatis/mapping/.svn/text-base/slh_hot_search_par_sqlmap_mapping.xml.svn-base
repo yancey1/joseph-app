@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_hotSearchPar">
+
+	<typeAlias alias="hotSearchParDomain" type="com.yancey.manager.domain.HotSearchParDomain" />
+	
+	<resultMap id="hotSearchParResult" class="hotSearchParDomain" >
+	    <result column="id" property="id" />
+	    <result column="type" property="type" />
+	    <result column="page_size" property="pageSize" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	</resultMap>
+	
+	<sql id="slh_hotSearchPar_query-conditions" >
+	    <dynamic>
+	      <isNotEmpty prepend="and" property="type" >
+	        	type = #type#
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="hotSearchParDomain">
+		SELECT COUNT(1) FROM slh_hot_search_parameter a WHERE 1 = 1 
+		<include refid="slh_hotSearchPar_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="hotSearchParResult" parameterClass="hotSearchParDomain">
+		SELECT 
+		id,
+		type,
+		page_size,
+		create_time,
+		modify_time
+		FROM slh_hot_search_parameter
+		WHERE 1 = 1 
+		<include refid="slh_hotSearchPar_query-conditions"/>
+		ORDER BY modify_time asc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="hotSearchParResult" parameterClass="java.lang.Integer">
+		SELECT 
+		id,
+		type,
+		page_size,
+		create_time,
+		modify_time
+		FROM slh_hot_search_parameter
+		WHERE id=#id#
+	</select>
+	
+	
+	<update id="UPDATE_ENTITY" parameterClass="hotSearchParDomain" >
+	  UPDATE slh_hot_search_parameter SET modify_time = NOW()
+	  <dynamic>
+	    <isNotEmpty prepend="," property="type">
+	      type = #type#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="pageSize">
+	      page_size = #pageSize#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE id = #id#
+	</update>
+	
+</sqlMap>

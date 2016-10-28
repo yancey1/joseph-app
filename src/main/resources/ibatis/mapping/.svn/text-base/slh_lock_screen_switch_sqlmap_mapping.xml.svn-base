@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_lockScreenSwitch">
+
+	<typeAlias alias="lockScreenSwitch" type="com.yancey.manager.domain.LockScreenSwitch" />
+	
+	<resultMap id="lockScreenSwitchResult" class="lockScreenSwitch" >
+	    <result column="state" property="state" />
+	</resultMap>
+	
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="lockScreenSwitchResult" parameterClass="lockScreenSwitch">
+		SELECT 
+		state
+		FROM slh_lock_screen_switch
+		WHERE 1 = 1 
+	</select>
+	
+	<update id="UPDATE_ENTITY" parameterClass="lockScreenSwitch" >
+	  UPDATE slh_lock_screen_switch SET state = #state#
+	</update>
+	
+</sqlMap>

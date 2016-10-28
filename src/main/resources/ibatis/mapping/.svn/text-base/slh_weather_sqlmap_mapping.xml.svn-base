@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_weather">
+
+	<typeAlias alias="weather" type="com.yancey.manager.domain.WeatherDomain" />
+	
+	<resultMap id="weatherResult" class="weather" >
+	    <result column="id" property="id" />
+	    <result column="link_title" property="linkTitle" />
+	    <result column="link_url" property="linkUrl" />
+	    <result column="html_content" property="htmlContent" />
+	    <result column="image_id" property="imageId" />
+	    <result column="weather_time" property="weatherTime" />
+	    <result column="display_mech" property="displayMech" />
+	    <result column="appoint_start_time" property="appointStartDate" />
+	    <result column="appoint_end_time" property="appointEndDate" />
+	    <result column="fixed_start_time" property="fixedStartTime" />
+	    <result column="fixed_end_time" property="fixedEndTime" />
+	    <result column="province_id" property="provinceId" />
+	    <result column="city_id" property="cityId" />
+	    <result column="provinceName" property="provinceName" />
+	    <result column="cityName" property="cityName" />
+	    <result column="order_num" property="orderNum" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	    <result column="image_id" property="image" select="slh_image.selectImageByRefId" />
+	</resultMap>
+	
+	<sql id="slh_weather_info_query-conditions" >
+	    <dynamic>
+	      <isNotEmpty prepend="and" property="title" >
+	        title like concat('%',#title#,'%') 
+	      </isNotEmpty>
+	      <isNotEmpty prepend="and" property="publishTimeStart">
+	      	weather_time &gt;= #publishTimeStart#
+	      </isNotEmpty>
+	      <isNotEmpty prepend="and" property="publishTimeEnd">
+	      	weather_time &lt;= #publishTimeEnd#
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="weather">
+		SELECT COUNT(1) FROM slh_weather_info a WHERE 1 = 1 
+		<include refid="slh_weather_info_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="weatherResult" parameterClass="weather">
+		SELECT 
+		id,
+		link_title,
+		link_url,
+		html_content,
+		image_id,
+		display_mech,
+		appoint_start_time,
+		appoint_end_time,
+		fixed_start_time,
+		fixed_end_time,
+		weather_time,
+		province_id,
+		city_id,
+		(select province_name from slh_ip.tbl_province_info where id=province_id) provinceName,
+		(select city_name from slh_ip.tbl_city_info where id=city_id) cityName,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_weather_info
+		WHERE 1 = 1 
+		<include refid="slh_weather_info_query-conditions"/>
+		ORDER BY order_num desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="weatherResult" parameterClass="weather">
+		SELECT 
+		id,
+		link_title,
+		link_url,
+		html_content,
+		image_id,
+		display_mech,
+		appoint_start_time,
+		appoint_end_time,
+		fixed_start_time,
+		fixed_end_time,
+		weather_time,
+		province_id,
+		city_id,
+		(select province_name from slh_ip.tbl_province_info where id=province_id) provinceName,
+		(select city_name from slh_ip.tbl_city_info where id=city_id) cityName,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_weather_info
+		WHERE 1 = 1 
+		
+		<dynamic>
+	      
+	      <isNotEmpty prepend="and" property="publishTimeStart">
+	    			<![CDATA[
+	    				weather_time >= #publishTimeStart#
+	    			]]>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="publishTimeEnd">
+	    			<![CDATA[
+	    				weather_time <= #publishTimeEnd#
+	    			]]>
+	    	</isNotEmpty>
+	      
+	    </dynamic>
+		ORDER BY modify_time DESC
+		<isNotEmpty property="pageStatus">
+				LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+		</isNotEmpty>
+	</select>
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="weatherResult" parameterClass="java.lang.Integer">
+		SELECT 
+		id,
+		link_title,
+		link_url,
+		html_content,
+		image_id,
+		display_mech,
+		appoint_start_time,
+		appoint_end_time,
+		fixed_start_time,
+		fixed_end_time,
+		weather_time,
+		province_id,
+		city_id,
+		(select province_name from slh_ip.tbl_province_info where id=province_id) provinceName,
+		(select city_name from slh_ip.tbl_city_info where id=city_id) cityName,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_weather_info
+		WHERE id=#id#
+	</select>
+	
+	<insert id="INSERT_ENTITY" parameterClass="weather" >
+		INSERT INTO slh_weather_info(link_title,link_url,image_id,weather_time,display_mech,appoint_start_time,appoint_end_time,
+		fixed_start_time,fixed_end_time,province_id,city_id,order_num,creator,create_time, modify_time)
+	 	VALUES(#linkTitle#,#linkUrl#,#imageId#,#weatherTime#,#displayMech#,#appointStartDate#,#appointEndDate#,
+	 	#fixedStartTime#,#fixedEndTime#,#provinceId#,#cityId#,#orderNum#,#creator#,NOW(), NOW())
+		<selectKey resultClass="java.lang.Integer" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<update id="UPDATE_ENTITY" parameterClass="weather" >
+	  UPDATE slh_weather_info SET modify_time = NOW()
+	  <dynamic>
+	    <isNotEmpty prepend="," property="title">
+	      title = #title#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="content">
+	      content = #content#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="weatherTime">
+	      weather_time = #weatherTime#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="provinceId">
+	      province_id = #provinceId#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="cityId">
+	      city_id = #cityId#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="imageId">
+	      image_id = #imageId#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="displayMech">
+	      display_mech = #displayMech#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="appointStartDate">
+	      appoint_start_time = #appointStartDate#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="appointEndDate">
+	      appoint_end_time = #appointEndDate#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="fixedStartTime">
+	      fixed_start_time = #fixedStartTime#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="fixedEndTime">
+	      fixed_end_time = #fixedEndTime#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="orderNum">
+	      order_num = #orderNum#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="linkTitle">
+	      link_title = #linkTitle#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="linkUrl">
+	      link_url = #linkUrl#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="htmlContent">
+	      html_content = #htmlContent#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE id = #id#
+	</update>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_weather_info where id = #id#
+	</delete>
+	
+	<select id="selectByCid" resultMap="weatherResult" parameterClass="java.lang.Integer">
+		SELECT 
+		id,
+		link_title,
+		link_url,
+		html_content,
+		image_id,
+		display_mech,
+		appoint_start_time,
+		appoint_end_time,
+		fixed_start_time,
+		fixed_end_time,
+		weather_time,
+		province_id,
+		city_id,
+		(select province_name from slh_ip.tbl_province_info where id=province_id) provinceName,
+		(select city_name from slh_ip.tbl_city_info where id=city_id) cityName,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_weather_info
+		WHERE id=#value#
+	</select>
+	
+	<select id="getMaxOrderNum" resultClass="java.lang.Integer">
+		select
+		ifnull(max(order_num),0)
+		from 
+		slh_weather_info
+	</select>
+	
+	
+	
+	
+	<select id="select_slh_weather_list" resultMap="weatherResult" parameterClass="weather">
+		SELECT 
+		id,
+		link_title,
+		link_url,
+		image_id,
+		html_content,
+		display_mech,
+		appoint_start_time,
+		appoint_end_time,
+		fixed_start_time,
+		fixed_end_time,
+		weather_time,
+		province_id,
+		city_id,
+		(select province_name from slh_ip.tbl_province_info where id=province_id) provinceName,
+		(select city_name from slh_ip.tbl_city_info where id=city_id) cityName,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_weather_info
+		WHERE 1 = 1 
+		ORDER BY modify_time DESC
+		<isNotEmpty property="pageStatus">
+				LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+		</isNotEmpty>
+	</select>
+	
+	<update id="modifyOrderNumBySave" parameterClass="java.util.Map">
+		update slh_weather_info set order_num=order_num+1
+		where 
+		order_num &gt;=#oldOrder#
+	</update>
+	
+	<update id="modifyMaxOrderNum" parameterClass="java.util.Map">
+		update slh_weather_info set order_num=order_num-1
+		where 
+		order_num &gt;#oldOrder#
+		and
+		order_num &lt;=#newOrder#
+	</update>
+	
+	<update id="modifyMinOrderNum" parameterClass="java.util.Map">
+		update slh_weather_info set order_num=order_num+1
+		where 
+		order_num &lt;#oldOrder#
+		and
+		order_num &gt;=#newOrder#
+	</update>
+</sqlMap>

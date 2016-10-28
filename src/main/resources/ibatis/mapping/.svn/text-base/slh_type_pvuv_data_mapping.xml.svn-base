@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_type_pvuv_data">
+
+	<typeAlias alias="typePVData" type="com.yancey.manager.domain.TypePvUvData" />
+	
+	<resultMap class="typePVData" id="typePVDataMap">
+		<result property="bizDate" column="biz_date"/>
+		<result property="channelId" column="channel_id"/>
+		<result property="wallPaperPv" column="wall_paper_pv"/>
+		<result property="wallPaperUv" column="wall_paper_uv"/>
+		<result property="jokePv" column="joke_pv"/>
+		<result property="jokeUv" column="joke_uv"/>
+		<result property="newsPv" column="news_pv"/>
+		<result property="newsUv" column="news_uv"/>
+		<result property="cartoonPv" column="cartoon_pv"/>
+		<result property="cartoonUv" column="cartoon_uv"/>
+		<result property="gamePv" column="game_pv"/>
+		<result property="gameUv" column="game_uv"/>
+		<result property="leftPv" column="left_pv"/>
+		<result property="leftUv" column="left_uv"/>
+		<result property="rightPv" column="right_pv"/>
+		<result property="rightUv" column="right_uv"/>
+		<result property="playShowPv" column="playShow_pv"/>
+		<result property="playShowUv" column="playShow_uv"/>
+	</resultMap>
+	
+	<sql id="type_pvuv_data_query_conditions" >
+	     <dynamic>
+     		<isNotEmpty prepend="and" property="startDate">
+	    				<![CDATA[
+	    				biz_date >= #startDate#
+	    			]]>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="endDate">
+	    			<![CDATA[
+	    				biz_date <= #endDate#
+	    			]]>
+	    	</isNotEmpty>
+	     	<isNotEmpty property="channelId" prepend="and">
+		     		channel_id =#channelId# 
+	     	</isNotEmpty>
+	    	
+	    </dynamic>
+	</sql>
+	
+	
+	
+	
+		<select id="select_slh_typepvuv_list" resultMap="typePVDataMap" parameterClass="typePVData">
+		SELECT
+			t.biz_date,
+			t.biz_app_id,
+			t.channel_id,
+			SUM(
+				IF (t.ref_type = 1, t.show_pv, 0)
+			) AS 'news_pv',
+			SUM(
+				IF (t.ref_type = 1, t.show_uv, 0)
+			) AS 'news_uv',
+			SUM(
+				IF (t.ref_type = 2, t.show_pv, 0)
+			) AS 'joke_pv',
+			SUM(
+				IF (t.ref_type = 2, t.show_uv, 0)
+			) AS 'joke_uv',
+			SUM(
+				IF (t.ref_type = 4, t.show_pv, 0)
+			) AS 'game_pv',
+			SUM(
+				IF (t.ref_type = 4, t.show_uv, 0)
+			) AS 'game_uv',
+			SUM(
+				IF (t.ref_type = 5, t.show_pv, 0)
+			) AS 'cartoon_pv',
+			SUM(
+				IF (t.ref_type = 5, t.show_uv, 0)
+			) AS 'cartoon_uv',
+			SUM(
+				IF (t.ref_type = 6, t.show_pv, 0)
+			) AS 'wall_paper_pv',
+			SUM(
+				IF (t.ref_type = 6, t.show_uv, 0)
+			) AS 'wall_paper_uv',
+			SUM(
+				IF (t.ref_type = 7, t.show_pv, 0)
+			) AS 'left_pv',
+			SUM(
+				IF (t.ref_type = 7, t.show_uv, 0)
+			) AS 'left_uv',
+			SUM(
+				IF (t.ref_type = 8, t.show_pv, 0)
+			) AS 'right_pv',
+			SUM(
+				IF (t.ref_type = 8, t.show_uv, 0)
+			) AS 'right_uv',
+			SUM(
+				IF (t.ref_type = 10, t.show_pv, 0)
+			) AS 'playShow_Pv',
+			SUM(
+				IF (t.ref_type = 10, t.show_uv, 0)
+			) AS 'playShow_uv'
+		FROM
+			slh_lock_screen_warehourse.slh_type_data_show t where 1=1 
+		<include refid="type_pvuv_data_query_conditions"/>
+		GROUP BY
+			t.biz_date,
+			t.biz_app_id,
+			t.channel_id
+		order by biz_date desc
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="typePVDataMap" parameterClass="typePVData">
+		SELECT
+			t.biz_date,
+			t.biz_app_id,
+			t.channel_id,
+			SUM(
+				IF (t.ref_type = 1, t.show_pv, 0)
+			) AS 'news_pv',
+			SUM(
+				IF (t.ref_type = 1, t.show_uv, 0)
+			) AS 'news_uv',
+			SUM(
+				IF (t.ref_type = 2, t.show_pv, 0)
+			) AS 'joke_pv',
+			SUM(
+				IF (t.ref_type = 2, t.show_uv, 0)
+			) AS 'joke_uv',
+			SUM(
+				IF (t.ref_type = 4, t.show_pv, 0)
+			) AS 'game_pv',
+			SUM(
+				IF (t.ref_type = 4, t.show_uv, 0)
+			) AS 'game_uv',
+			SUM(
+				IF (t.ref_type = 5, t.show_pv, 0)
+			) AS 'cartoon_pv',
+			SUM(
+				IF (t.ref_type = 5, t.show_uv, 0)
+			) AS 'cartoon_uv',
+			SUM(
+				IF (t.ref_type = 6, t.show_pv, 0)
+			) AS 'wall_paper_pv',
+			SUM(
+				IF (t.ref_type = 6, t.show_uv, 0)
+			) AS 'wall_paper_uv',
+			SUM(
+				IF (t.ref_type = 7, t.show_pv, 0)
+			) AS 'left_pv',
+			SUM(
+				IF (t.ref_type = 7, t.show_uv, 0)
+			) AS 'left_uv',
+			SUM(
+				IF (t.ref_type = 8, t.show_pv, 0)
+			) AS 'right_pv',
+			SUM(
+				IF (t.ref_type = 8, t.show_uv, 0)
+			) AS 'right_uv',
+			SUM(
+				IF (t.ref_type = 10, t.show_pv, 0)
+			) AS 'playShow_Pv',
+			SUM(
+				IF (t.ref_type = 10, t.show_uv, 0)
+			) AS 'playShow_uv'
+		FROM
+			slh_lock_screen_warehourse.slh_type_data_show t where 1=1 
+		<include refid="type_pvuv_data_query_conditions"/>
+		GROUP BY
+			t.biz_date,
+			t.biz_app_id,
+			t.channel_id
+		order by biz_date desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="typePVDataMap" parameterClass="typePVData">
+		SELECT
+			t.biz_date,
+			t.biz_app_id,
+			t.channel_id,
+			SUM(
+				IF (t.ref_type = 1, t.show_pv, 0)
+			) AS 'news_pv',
+			SUM(
+				IF (t.ref_type = 1, t.show_uv, 0)
+			) AS 'news_uv',
+			SUM(
+				IF (t.ref_type = 2, t.show_pv, 0)
+			) AS 'joke_pv',
+			SUM(
+				IF (t.ref_type = 2, t.show_uv, 0)
+			) AS 'joke_uv',
+			SUM(
+				IF (t.ref_type = 4, t.show_pv, 0)
+			) AS 'game_pv',
+			SUM(
+				IF (t.ref_type = 4, t.show_uv, 0)
+			) AS 'game_uv',
+			SUM(
+				IF (t.ref_type = 5, t.show_pv, 0)
+			) AS 'cartoon_pv',
+			SUM(
+				IF (t.ref_type = 5, t.show_uv, 0)
+			) AS 'cartoon_uv',
+			SUM(
+				IF (t.ref_type = 6, t.show_pv, 0)
+			) AS 'wall_paper_pv',
+			SUM(
+				IF (t.ref_type = 6, t.show_uv, 0)
+			) AS 'wall_paper_uv',
+			SUM(
+				IF (t.ref_type = 7, t.show_pv, 0)
+			) AS 'left_pv',
+			SUM(
+				IF (t.ref_type = 7, t.show_uv, 0)
+			) AS 'left_uv',
+			SUM(
+				IF (t.ref_type = 8, t.show_pv, 0)
+			) AS 'right_pv',
+			SUM(
+				IF (t.ref_type = 8, t.show_uv, 0)
+			) AS 'right_uv',
+			SUM(
+				IF (t.ref_type = 10, t.show_pv, 0)
+			) AS 'playShow_Pv',
+			SUM(
+				IF (t.ref_type = 10, t.show_uv, 0)
+			) AS 'playShow_uv'
+		FROM
+			slh_lock_screen_warehourse.slh_type_data_show t where 1=1 
+		<include refid="type_pvuv_data_query_conditions"/>
+		GROUP BY
+			t.biz_date,
+			t.biz_app_id,
+			t.channel_id
+		order by biz_date desc
+	</select>
+	
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer" parameterClass="typePVData">
+		SELECT count(1) from (SELECT 1
+		FROM
+			slh_lock_screen_warehourse.slh_type_data_show t where 1=1 
+			<include refid="type_pvuv_data_query_conditions"/>
+		GROUP BY
+			t.biz_date,
+			t.biz_app_id,
+			t.channel_id
+		order by biz_date desc) as t1 
+		
+	</select>
+</sqlMap>

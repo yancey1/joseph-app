@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_page_game">
+
+	<typeAlias alias="pageGameDomain" type="com.yancey.manager.domain.PageGameDomain" />
+	<typeAlias alias="Image" type="com.yancey.manager.domain.Image" />
+	<typeAlias alias="pageGameImage" type="com.yancey.manager.domain.PageGameImage" />
+	
+	<resultMap id="pageGameDomainResult" class="pageGameDomain" >
+	    <result column="id" property="id" />
+	    <result column="name" property="name" />
+	    <result column="image_id" property="imageId"/>
+	    <result column="image_id" property="image" select="slh_image.selectImageByRefId" />
+	    <result column="link_url" property="linkUrl" />
+	    <result column="operate_desc" property="operateDesc" />
+	    <result column="game_introduct" property="gameIntroduct" />
+	    <result column="is_down" property="isDown" />
+	    <result column="init_delta_num" property="playCount" />
+	    <result column="creator" property="creator" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	    <result column="id" property="images" select="slh_page_game.selectImagesById" />
+	</resultMap>
+	
+	<sql id="slh_page_game_query-conditions" >
+	    <dynamic>
+	    	<isNotEmpty property="name">
+		     	<isNotNull prepend="and" property="name">
+		     		name like '%$name$%'
+		     	</isNotNull>
+	     	</isNotEmpty>
+			<isNotEmpty property="isDown" prepend="and">
+		     		is_down = #isDown#
+	     	</isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="pageGameDomain">
+		SELECT COUNT(1) FROM slh_page_game_info a WHERE 1 = 1 
+		<include refid="slh_page_game_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="pageGameDomainResult" parameterClass="pageGameDomain">
+		SELECT 
+			game_id,
+			game_name,
+			init_delta_num,
+			real_player_num,
+			create_time,
+			modify_time
+		FROM slh_page_game_info
+		WHERE 1 = 1 
+		<include refid="slh_page_game_query-conditions"/>
+		ORDER BY modify_time asc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	
+	
+	
+	<select id="select_slh_page_game_list_count" resultClass="int" parameterClass="pageGameDomain">
+		SELECT 
+			COUNT(1)
+		FROM
+			slh_page_game_info a 
+		WHERE 1 = 1 
+		<include refid="slh_page_game_query-conditions"/>
+	</select>
+	
+	
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="pageGameDomainResult" parameterClass="pageGameDomain">
+		SELECT 
+			id,
+			name,
+			image_id,
+			operate_desc,
+			game_introduct,
+			link_url,
+			is_down,
+			creator,
+			create_time,
+			modify_time,
+			(select init_delta_num from slh_page_game_data_info where game_id=id) as init_delta_num
+		FROM slh_page_game_info
+		WHERE 1 = 1 
+		<dynamic>
+			<isNotEmpty prepend="and" property="id">
+				id =#id#
+			</isNotEmpty>
+	    </dynamic>
+	    ORDER BY modify_time DESC
+	</select>
+	
+	
+	
+	<select id="select_slh_page_game_page_list" resultMap="pageGameDomainResult" parameterClass="pageGameDomain">
+		SELECT 
+			id,
+			name,
+			image_id,
+			operate_desc,
+			game_introduct,
+			link_url,
+			is_down,
+			creator,
+			create_time,
+			modify_time,
+			(select init_delta_num from slh_page_game_data_info where game_id=id) as init_delta_num
+		FROM slh_page_game_info
+		WHERE 1 = 1 
+		<include refid="slh_page_game.slh_page_game_query-conditions"/>
+		ORDER BY  modify_time DESC 
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="pageGameDomainResult" parameterClass="java.lang.Integer">
+		SELECT 
+			id,
+			name,
+			image_id,
+			operate_desc,
+			game_introduct,
+			link_url,
+			is_down,
+			creator,
+			create_time,
+			modify_time,
+			(select init_delta_num from slh_page_game_data_info where game_id=id) as init_delta_num
+		FROM slh_page_game_info
+		WHERE 1 = 1 
+		and id=#id#
+	</select>
+	
+		<insert id="insert_slh_page_game" parameterClass="pageGameDomain" >
+		 INSERT INTO slh_page_game_info(
+				name,
+				image_id,
+				operate_desc,
+				game_introduct,
+				link_url,
+				is_down,
+				creator,
+				create_time,
+				modify_time
+		)
+		VALUES
+			(#name#, #imageId#, #operateDesc#,#gameIntroduct#,#linkUrl#,#isDown#,#creator#,NOW(),NOW())
+	  <selectKey resultClass="java.lang.Integer" keyProperty="id" >
+	    SELECT LAST_INSERT_ID()
+	  </selectKey>
+	</insert>
+	
+	<insert id="insert_slh_page_game_image" parameterClass="pageGameImage" >
+	  INSERT INTO slh_page_game_image_mapping(
+		game_id,
+		image_id,
+		order_num
+	  )
+	 VALUES
+		(#gameId#, #imageId#, #orderNum#)
+	</insert>
+	
+	<update id="update_slh_page_game" parameterClass="pageGameDomain">
+		update 
+		slh_page_game_info
+		set 
+		modify_time=now(),
+		name=#name#,
+		link_url=#linkUrl#,
+		image_id=#imageId#,
+		operate_desc=#operateDesc#,
+		game_introduct=#gameIntroduct#,
+		is_down=#isDown#
+		where id=#id#
+	</update>
+	
+	<select id="select_slh_page_game" resultMap="pageGameDomainResult" parameterClass="pageGameDomain">
+		SELECT 
+			id,
+			name,
+			image_id,
+			operate_desc,
+			game_introduct,
+			link_url,
+			is_down,
+			creator,
+			create_time,
+			modify_time,
+			(select init_delta_num from slh_page_game_data_info where game_id=id) as init_delta_num
+		FROM slh_page_game_info
+		WHERE 1 = 1
+		<dynamic>
+			<isNotNull prepend="and" property="id">
+				id = #id#
+			</isNotNull>
+		</dynamic>
+	</select>
+	
+	
+	
+	<update id="update_slh_page_game_image" parameterClass="pageGameImage">
+		update
+		slh_page_game_image_mapping
+		set
+		image_id=#newImageId#
+		WHERE
+			game_id = #gameId#
+			and 
+			image_id=#imageId#
+	</update>
+	
+	
+	<select id="select_slh_page_game_for_game_id" resultMap="pageGameDomainResult" parameterClass="java.lang.Integer">
+		SELECT 
+			id,
+			name,
+			image_id,
+			operate_desc,
+			game_introduct,
+			link_url,
+			is_down,
+			creator,
+			create_time,
+			modify_time,
+			(select init_delta_num from slh_page_game_data_info where game_id=id) as init_delta_num
+		FROM slh_page_game_info
+		WHERE 1 = 1 and 
+			id = #value#
+	</select>
+	
+	<select id="selectImagesById" resultClass="Image" parameterClass="java.lang.Integer">
+	 	SELECT
+			i.image_id AS imageId,
+			i.image_name AS imageName,
+			i.image_type AS imageType,
+			i.image_width AS imageWidth,
+			i.image_height AS imageHeight,
+			i.hd_image_url AS hdImgaeUrl,
+			i.nhd_image_url AS nhdImageUrl,
+			i.status AS status,
+			i.creator AS creator,
+			i.create_time AS createTime,
+			i.modify_time AS modifyTime
+		FROM
+			slh_image i,
+			slh_page_game_image_mapping p
+		WHERE
+			i.image_id = p.image_id
+		AND p.game_id = #id#
+		order by p.order_num
+	</select>
+	
+	<insert id="insertInitPlayCount" parameterClass="pageGameDomain">
+		insert into
+		slh_page_game_data_info
+		(
+		game_id,
+		game_name,
+		init_delta_num,
+		create_time,
+		modify_time
+		)
+		values
+		(
+		#id#,
+		#name#,
+		#playCount#,
+		now(),
+		now()
+		)
+	</insert>
+	
+	<update id="updateInitPlayCount" parameterClass="pageGameDomain">
+		update 
+		slh_page_game_data_info
+		set 
+		init_delta_num=#playCount#,
+		game_name=#name#
+		where game_id=#id#
+	</update>
+<!-- 	
+	
+	<update id="UPDATE_ENTITY" parameterClass="pageGameDomain" >
+	  UPDATE slh_game_data_info SET modify_time = NOW()
+	  <dynamic>
+	    <isNotEmpty prepend="," property="initDeltaNum">
+	      init_delta_num = #initDeltaNum#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE game_id=#gameId#
+	</update>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_game_data_info where game_id=#gameId#
+	</delete> -->
+	
+</sqlMap>

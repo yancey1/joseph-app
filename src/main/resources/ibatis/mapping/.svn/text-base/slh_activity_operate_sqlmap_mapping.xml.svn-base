@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_activity_operate">
+
+	<typeAlias alias="activityOperateDomain" type="com.yancey.manager.domain.ActivityOperate" />
+	
+	<resultMap id="activityOperateMap" class="activityOperateDomain" >
+	    <result column="id" property="id" />
+	    <result column="name" property="name" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	</resultMap>
+	
+	<sql id="slh_activity_operate_query-conditions" >
+	    <dynamic>
+	      <isNotEmpty prepend="and" property="name" >
+	        name like concat('%',#name#,'%') 
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="activityOperateDomain">
+		SELECT COUNT(1) FROM slh_activity_operate_info a WHERE 1 = 1 
+		<include refid="slh_activity_operate_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="activityOperateMap" parameterClass="activityOperateDomain">
+		SELECT 
+			id,
+			`name`,
+			create_time,
+			modify_time
+		FROM slh_activity_operate_info t
+		WHERE 1 = 1 
+		<include refid="slh_activity_operate_query-conditions"/>
+		ORDER BY modify_time desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="activityOperateMap" parameterClass="java.lang.Integer">
+		SELECT 
+			id,
+			`name`,
+			create_time,
+			modify_time
+		FROM slh_activity_operate_info
+		WHERE id=#id#
+	</select>
+	
+	
+	<update id="UPDATE_ENTITY" parameterClass="activityOperateDomain" >
+	  UPDATE slh_activity_operate_info SET modify_time = NOW()
+	  <dynamic>
+	    <isNotEmpty prepend="," property="name">
+	      name = #name#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE id = #id#
+	</update>
+	
+</sqlMap>

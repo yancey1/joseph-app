@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_lottery_draw_activity_prize_mapp">
+
+	<typeAlias alias="drawActivityPrizeMapp" type="com.yancey.manager.domain.DrawActivityPrizeMapp" />
+	
+	<resultMap class="drawActivityPrizeMapp" id="drawActivityPrizeMappMap">
+		<result property="activityId" column="activity_id"/>
+		<result property="prizeId" column="prize_id"/>
+		<result property="orderNum" column="order_num"/>
+		<result property="prizeDomain" column="prize_id" select="slh_prize.SELECT_ENTITY_BY_ID"/>
+	</resultMap>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="drawActivityPrizeMappMap" parameterClass="drawActivityPrizeMapp">
+		select 
+			activity_id,
+			prize_id,
+			order_num
+		from slh_lottery_draw_activity_prize_mapp
+		where 1=1
+		<dynamic>
+			<isNotEmpty prepend="and" property="activityId">
+				activity_id=#activityId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_lottery_draw_activity_prize_mapp where activity_id=#id#
+	</delete>	
+		
+	<insert id="INSERT_ENTITY" parameterClass="drawActivityPrizeMapp">
+		insert into slh_lottery_draw_activity_prize_mapp(activity_id,prize_id,order_num)
+		values (#activityId#,#prizeId#,#orderNum#)
+	</insert>	
+
+	<select id="SELECT_ENTITY_BY_ID" resultMap="drawActivityPrizeMappMap" parameterClass="java.lang.Integer">
+		SELECT 
+		activity_id,prize_id,order_num
+		FROM slh_lottery_draw_activity_prize_mapp
+		WHERE activity_id=#id#
+	</select>
+</sqlMap>

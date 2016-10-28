@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMapConfig      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+	<settings cacheModelsEnabled="false" enhancementEnabled="false"
+		lazyLoadingEnabled="false" maxRequests="3000" maxSessions="3000"
+		maxTransactions="3000" useStatementNamespaces="true" />
+
+	<sqlMap resource="ibatis/mapping/slh_user_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_role_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_menu_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_image_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_apk_update_info_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_apk_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_province_city_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_joke_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_weather_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_province_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_city_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_news_info_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_wall_paper_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_wall_paper_image_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_consult_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_consult_ref_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_user_remain_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_lock_screen_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_lock_screen_ref_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_push_theme_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_lock_type_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_lock_screen_switch_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_type_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_left_slip_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_play_game_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_cartoon_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_game_data_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_user_remain_sum_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_remain_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_remain_sum_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_total_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_type_pvuv_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_version_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_topic_info_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_version_uv_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_assembly_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_assembly_apk_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_page_game_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_page_game_classify_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_page_game_classify_mapp_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_ref_comment_mapp_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_page_game_deploy_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_adver_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_comment_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_recommend_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_hot_word_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_ranking_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_hot_search_par_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_apk_download_data_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_page_game_data_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_topic_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_biz_app_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_biz_app_topic_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_choose_like_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_apk_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_game_nav_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_page_game_pvuv_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_lock_screen_pvuv_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_search_pvuv_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_collection_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_joke_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_news_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_cartoon_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_wall_paper_pvuv_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_wall_paper_data_mapping.xml" />
+	
+	
+	<sqlMap resource="ibatis/mapping/slh_infor_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_win_record_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_activity_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_lottery_draw_activity_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_activity_mapp_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_biz_activity_mapp_mapping.xml" />
+	
+	<sqlMap resource="ibatis/mapping/slh_prize_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_lottery_draw_activity_prize_mapp_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_strategy_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_strategy_comment_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_activity_operate_sqlmap_mapping.xml" />
+	
+	<sqlMap resource="ibatis/mapping/slh_login_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_register_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_strategy_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_infor_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_interact_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_activity_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_income_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_pay_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_balance_data_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_banner_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_classify_sqlmap_mapping.xml" />
+</sqlMapConfig>

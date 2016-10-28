@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_province">
+
+	<typeAlias alias="provinceCityDomain" type="com.yancey.manager.domain.ProvinceCityDomain" />
+	
+	<select id="getProvinceList" resultClass="provinceCityDomain" parameterClass="provinceCityDomain">
+		SELECT id as provinceId,province_name as provinceName
+		FROM slh_ip.tbl_province_info
+		where 1=1
+		<isNotEmpty prepend="and" property="provinceName">
+			province_name like concat('%',#provinceName#,'%')
+		</isNotEmpty>
+		ORDER BY id 
+	</select>
+	
+	<select id="getCityList" resultClass="provinceCityDomain" parameterClass="provinceCityDomain">
+		SELECT id as cityId,city_name as cityName
+		FROM slh_ip.tbl_city_info
+		where 1=1
+		<isNotEmpty prepend="and" property="provinceId">
+			province_id =#provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cityName">
+			city_name like concat('%',#cityName#,'%')
+		</isNotEmpty>
+		ORDER BY id 
+	</select>
+	
+</sqlMap>

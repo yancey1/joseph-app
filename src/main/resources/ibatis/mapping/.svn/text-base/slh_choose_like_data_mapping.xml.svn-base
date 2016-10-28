@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_choose_like_data">
+
+	<typeAlias alias="chooseLikeData" type="com.yancey.manager.domain.ChooseLikeData" />
+	
+	<resultMap class="chooseLikeData" id="chooseLikeDataMap">
+		<result property="bizDate" column="biz_date"/>
+		<result property="bizAppId" column="biz_app_id"/>
+		<result property="channelId" column="channel_id"/>
+		<result property="topicId" column="topic_id"/>
+		<result property="topicName" column="topic_name"/>
+		<result property="selectNum" column="select_num"/>
+		<result property="selectPer" column="select_per"/>
+		<result property="createTime" column="create_time"/>
+	</resultMap>
+	
+	<sql id="choose_liek_data_query_conditions" >
+	     <dynamic>
+	    	<isNotEmpty prepend="and" property="startDate">
+	    			<![CDATA[
+	    				biz_date >= #startDate#
+	    			]]>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="endDate">
+	    			<![CDATA[
+	    				biz_date <= #endDate#
+	    			]]>
+	    	</isNotEmpty>
+	     	<isNotEmpty property="channelId" prepend="and">
+		     		channel_id =#channelId# 
+	     	</isNotEmpty>
+	     	<isNotEmpty property="bizAppId" prepend="and">
+		     		biz_app_id =#bizAppId# 
+	     	</isNotEmpty>
+	    </dynamic>
+	</sql>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="chooseLikeDataMap" parameterClass="chooseLikeData">
+		select 
+			biz_date,
+			biz_app_id,
+			channel_id,
+			topic_id,
+			topic_name,
+			select_num,
+			select_per,
+			create_time
+		from slh_lock_screen_warehourse.slh_choose_like_data
+		where 1=1
+		<include refid="choose_liek_data_query_conditions"/>
+		order by biz_date desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer" parameterClass="chooseLikeData">
+		select 
+		count(1)
+		from slh_lock_screen_warehourse.slh_choose_like_data
+		where 1=1
+		<include refid="choose_liek_data_query_conditions"/>
+	</select>
+	
+	<select id="select_slh_choose_like_data_list" resultMap="chooseLikeDataMap" parameterClass="chooseLikeData">
+		select 
+			biz_date,
+			biz_app_id,
+			channel_id,
+			topic_id,
+			topic_name,
+			select_num,
+			select_per,
+			create_time
+			from slh_lock_screen_warehourse.slh_choose_like_data
+		where 1=1
+		<include refid="choose_liek_data_query_conditions"/>
+		order by biz_date desc
+	</select>
+	
+</sqlMap>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_income_data">
+
+	<typeAlias alias="incomeData" type="com.yancey.manager.domain.IncomeData" />
+	
+	<resultMap class="incomeData" id="incomeDataMap">
+		<result property="bizDate" column="biz_date"/>
+		<result property="bizAppId" column="biz_app_id"/>
+		<result property="channelId" column="channel_id"/>
+		<result property="incomeResource" column="income_resource"/>
+		<result property="scoreNum" column="score_num"/>
+		<result property="createTime" column="create_time"/>
+	</resultMap>
+	
+	<sql id="income_data_query_conditions" >
+	     <dynamic>
+	    	<isNotEmpty prepend="and" property="startDate">
+	    			<![CDATA[
+	    				biz_date >= #startDate#
+	    			]]>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="endDate">
+	    			<![CDATA[
+	    				biz_date <= #endDate#
+	    			]]>
+	    	</isNotEmpty>
+	     	<isNotEmpty property="channelId" prepend="and">
+		     		channel_id =#channelId# 
+	     	</isNotEmpty>
+	     	<isNotEmpty property="bizAppId" prepend="and">
+		     		biz_app_id =#bizAppId# 
+	     	</isNotEmpty>
+	    </dynamic>
+	</sql>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="incomeDataMap" parameterClass="incomeData">
+		select 
+			biz_date,
+			biz_app_id,
+			channel_id,
+			income_resource,
+			score_num,
+			create_time
+		from slh_lock_screen_warehourse.slh_income_data
+		where 1=1
+		<include refid="income_data_query_conditions"/>
+		order by biz_date desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer" parameterClass="incomeData">
+		select 
+		count(1)
+		from slh_lock_screen_warehourse.slh_income_data
+		where 1=1
+		<include refid="income_data_query_conditions"/>
+	</select>
+	
+	<select id="select_slh_income_data_list" resultMap="incomeDataMap" parameterClass="incomeData">
+		select 
+			biz_date,
+			biz_app_id,
+			channel_id,
+			income_resource,
+			score_num,
+			create_time
+		from slh_lock_screen_warehourse.slh_income_data 
+		where 1=1
+		<include refid="income_data_query_conditions"/>
+		order by biz_date desc
+	</select>
+	
+</sqlMap>

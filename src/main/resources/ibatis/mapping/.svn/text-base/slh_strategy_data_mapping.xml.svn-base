@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_strategy_data">
+
+	<typeAlias alias="strategyData" type="com.yancey.manager.domain.StrategyData" />
+	
+	<resultMap class="strategyData" id="strategyDataMap">
+		<result property="bizDate" column="biz_date"/>
+		<result property="bizAppId" column="biz_app_id"/>
+		<result property="channelId" column="channel_id"/>
+		<result property="strategyId" column="strategy_id"/>
+		<result property="pv" column="pv"/>
+		<result property="uv" column="uv"/>
+		<result property="commentNum" column="commentNum"/>
+		<result property="createTime" column="create_time"/>
+	</resultMap>
+	
+	<sql id="strategy_data_query_conditions" >
+	     <dynamic>
+	    	<isNotEmpty prepend="and" property="startDate">
+	    			<![CDATA[
+	    				biz_date >= #startDate#
+	    			]]>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="endDate">
+	    			<![CDATA[
+	    				biz_date <= #endDate#
+	    			]]>
+	    	</isNotEmpty>
+	     	<isNotEmpty property="channelId" prepend="and">
+		     		channel_id =#channelId# 
+	     	</isNotEmpty>
+	     	<isNotEmpty property="bizAppId" prepend="and">
+		     		biz_app_id =#bizAppId# 
+	     	</isNotEmpty>
+	    </dynamic>
+	</sql>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="strategyDataMap" parameterClass="strategyData">
+		select 
+			biz_date,
+			biz_app_id,
+			channel_id,
+			strategy_id,
+			pv,
+			uv,
+			create_time
+		from slh_lock_screen_warehourse.slh_strategy_data
+		where 1=1
+		<include refid="strategy_data_query_conditions"/>
+		order by biz_date desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer" parameterClass="strategyData">
+		select 
+		count(1)
+		from slh_lock_screen_warehourse.slh_strategy_data
+		where 1=1
+		<include refid="strategy_data_query_conditions"/>
+	</select>
+	
+	<select id="select_slh_strategy_data_list" resultMap="strategyDataMap" parameterClass="strategyData">
+		select 
+			biz_date,
+			biz_app_id,
+			channel_id,
+			strategy_id,
+			pv,
+			uv,
+			create_time
+		from slh_lock_screen_warehourse.slh_strategy_data 
+		where 1=1
+		<include refid="strategy_data_query_conditions"/>
+		order by biz_date desc
+	</select>
+	
+</sqlMap>

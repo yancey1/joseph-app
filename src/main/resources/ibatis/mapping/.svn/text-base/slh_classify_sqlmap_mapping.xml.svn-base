@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_classify">
+
+	<typeAlias alias="classifyDomain" type="com.yancey.manager.domain.ClassifyInfoDomain" />
+	<typeAlias alias="classifyMappingDomain" type="com.yancey.manager.domain.ClassifyMappingDomain" />
+	
+	<resultMap id="classifyResult" class="classifyDomain" >
+	    <result column="classify_id" property="classifyId" />
+	    <result column="classify_name" property="classifyName" />
+	    <result column="order_num" property="orderNum" />
+	    <result column="remarks" property="remarks" />
+	    <result column="create_time" property="createTime" />
+		<result column="modify_time" property="modifyTime" />
+	</resultMap>
+	
+	<sql id="slh_classify_query_conditions" >
+	    <dynamic>
+	      <isNotEmpty prepend="and" property="classifyName" >
+	        classify_name like concat('%',#classifyName#,'%') 
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer" parameterClass="classifyDomain">
+		SELECT COUNT(1) FROM slh_classify_info a WHERE 1 = 1 
+		<include refid="slh_classify_query_conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="classifyResult" parameterClass="classifyDomain">
+		SELECT 
+		classify_id,
+		classify_name,
+		order_num,
+		remarks,
+		create_time,
+		modify_time
+		FROM slh_classify_info
+		WHERE 1 = 1 
+		<include refid="slh_classify_query_conditions"/>
+		ORDER BY order_num 
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="classifyResult" parameterClass="classifyDomain">
+		SELECT 
+		classify_id,
+		classify_name,
+		order_num,
+		remarks,
+		create_time,
+		modify_time
+		FROM slh_classify_info
+		WHERE 1 = 1 
+		<dynamic>
+			<isNotEmpty prepend="and" property="classifyName">
+				classify_name=#classifyName#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="classifyId">
+				classify_id &lt;&gt;#classifyId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="classifyResult" parameterClass="java.lang.Integer">
+		SELECT 
+		classify_id,
+		classify_name,
+		order_num,
+		remarks,
+		create_time,
+		modify_time
+		FROM slh_classify_info
+		WHERE classify_id=#id#
+	</select>
+	
+	<insert id="INSERT_ENTITY" parameterClass="classifyDomain" >
+		INSERT INTO slh_classify_info(classify_name,order_num,remarks,create_time, modify_time)
+	 	VALUES(#classifyName#,#orderNum#,#remarks#,NOW(), NOW())
+	</insert>
+	
+	<update id="UPDATE_ENTITY" parameterClass="classifyDomain" >
+	  UPDATE slh_classify_info SET modify_time = NOW()
+	  <dynamic>
+	    <isNotEmpty prepend="," property="classifyName">
+	      classify_name = #classifyName#
+	    </isNotEmpty>
+	      <isNotEmpty prepend="," property="orderNum">
+	      order_num = #orderNum#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="remarks">
+	      remarks = #remarks#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE classify_id = #classifyId#
+	</update>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_classify_info where classify_id = #id#
+	</delete>
+	
+	<select id="selectClassifyRefMappiing" resultClass="classifyMappingDomain" parameterClass="java.util.Map">
+		SELECT 
+		classify_id as classifyId,
+		assembly_type as assemblyType,
+		apk_id as apkId,
+		order_num as orderNum
+		FROM slh_classify_ref_mapping
+		WHERE 
+		classify_id=#classifyId#
+		order by order_num
+	</select>
+	
+	<select id="selectClassifyAssemblyApkMappiing" resultClass="classifyMappingDomain" parameterClass="java.util.Map">
+		SELECT 
+		classify_id as classifyId,
+		assembly_type as assemblyType,
+		apk_id as apkId,
+		order_num as orderNum
+		FROM slh_classify_assembly_apk_mappping
+		WHERE 
+		classify_id=#classifyId#
+		and
+		assembly_type=#refType#
+		order by order_num
+	</select>
+	
+	<delete id="deleteClassifyRefById" parameterClass="java.lang.Integer">
+		delete from slh_classify_ref_mapping where classify_id=#classifyId#
+	</delete>
+	
+	<delete id="deleteClassifyAssemblyApkById" parameterClass="classifyMappingDomain">
+		delete from slh_classify_assembly_apk_mappping 
+		where
+	    classify_id=#classifyId#
+	    and
+	    assembly_type=#refType#
+	</delete>
+	
+	<insert id="saveClassifyRef" parameterClass="classifyMappingDomain">
+		insert into slh_classify_ref_mapping 
+		(classify_id,assembly_type,apk_id,order_num) 
+		values 
+		(#classifyId#,#refType#,#apkId#,#orderNum#)
+	</insert>
+	
+	<insert id="saveClassifyAssemblyApk" parameterClass="classifyMappingDomain">
+		insert into slh_classify_assembly_apk_mappping 
+		(classify_id,assembly_type,apk_id,order_num) 
+		values 
+		(#classifyId#,#refType#,#apkId#,#orderNum#)
+	</insert>
+	
+	<select id="getMaxOrderNum" resultClass="java.lang.Integer">
+		select
+		ifnull(max(order_num),0)
+		from 
+		slh_classify_info
+	</select>
+	
+	<update id="modifyOrderNumBySave" parameterClass="java.util.Map">
+		update slh_classify_info set order_num=order_num+1
+		where 
+		order_num &gt;=#oldOrder#
+	</update>
+	
+	<update id="modifyMaxOrderNum" parameterClass="java.util.Map">
+		update slh_classify_info set order_num=order_num-1
+		where 
+		order_num &gt;#oldOrder#
+		and
+		order_num &lt;=#newOrder#
+	</update>
+	
+	<update id="modifyMinOrderNum" parameterClass="java.util.Map">
+		update slh_classify_info set order_num=order_num+1
+		where 
+		order_num &lt;#oldOrder#
+		and
+		order_num &gt;=#newOrder#
+	</update>
+	
+	<update id="modifyOrderNumByDelete" parameterClass="java.util.Map">
+		update slh_classify_info set order_num=order_num-1
+		where
+		order_num &gt;#num#
+	</update>
+</sqlMap>

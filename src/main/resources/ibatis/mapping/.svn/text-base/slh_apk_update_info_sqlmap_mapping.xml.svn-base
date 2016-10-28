@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_apkupdateinfo">
+
+	<typeAlias alias="ApkUpdateInfo" type="com.yancey.manager.domain.ApkUpdateInfo" />
+	
+	<resultMap id="apkUpdateInforResultMap" class="ApkUpdateInfo" >
+	    <result column="id" property="id" />
+	    <result column="appId" property="appId" />
+	    <result column="appName" property="appName" />
+	    <result column="channel_id" property="channelId" />
+	    <result column="province_id" property="provinceId" />
+	    <result column="city_id" property="cityId" />
+	    <result column="title" property="title" />
+	    <result column="content" property="content" />
+	    <result column="update_type" property="updateType" />
+	    <result column="package_name" property="packageName" />
+	    <result column="res_ver" property="resVer" />
+	    <result column="res_name" property="resName" />
+	    <result column="res_size" property="resSize" />
+	    <result column="res_url" property="resUrl" />
+	    <result column="res_md5" property="urlMd5" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	    <result column="cityName" property="cityName" />
+	    <result column="provinceName" property="provinceName" />
+	</resultMap>
+	
+	<sql id="slh_file_resource_info_query_conditions" >
+	    <dynamic>
+	      <isNotNull prepend="and" property="appId" >
+	        app_id = #appId#
+	      </isNotNull>
+	      <isNotNull prepend="and" property="channelId" >
+	        channel_id like '%$channelId$%'
+	      </isNotNull>
+	      <isNotNull prepend="and" property="packageName" >
+	        package_name like '%$packageName$%'
+	      </isNotNull>
+
+	    </dynamic>
+	</sql>
+
+	<select id="select_slh_file_resource_info_list_count" resultClass="java.lang.Integer"	parameterClass="ApkUpdateInfo">
+		SELECT
+			COUNT(1)
+		FROM
+			slh_file_resource_info
+		WHERE
+			1 = 1
+		<include refid="slh_file_resource_info_query_conditions"/>
+	</select>
+	<select id="select_slh_file_resource_info_list" resultMap="apkUpdateInforResultMap" parameterClass="ApkUpdateInfo">
+		SELECT
+			id,
+			app_id as appId,
+			(select app_name from slh_project_info where app_id=appId) appName,
+			channel_id,
+			province_id,
+			city_id,
+			title,
+			content,
+			update_type,
+			package_name,
+			res_ver,
+			res_name,
+			res_size,
+			res_url,
+			res_md5,
+			create_time,
+			modify_time,
+			(select province_name from slh_ip.tbl_province_info where id=province_id) provinceName,
+			(select city_name from slh_ip.tbl_city_info where id=city_id) cityName
+		FROM
+			slh_file_resource_info 
+		WHERE
+			1 = 1
+		<include refid="slh_file_resource_info_query_conditions"/>
+		ORDER BY modify_time DESC
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<insert id="insert_slh_file_resource_info" parameterClass="ApkUpdateInfo" >
+	 INSERT INTO slh_file_resource_info(
+			app_id,
+			channel_id,
+			province_id,
+			city_id,
+			title,
+			content,
+			update_type,
+			package_name,
+			res_ver,
+			res_name,
+			res_size,
+			res_url,
+			url_md5,
+			res_md5,
+			create_time,
+			modify_time
+		)
+		VALUES
+			(
+				#appId#, #channelId#, #provinceId#,#cityId#, #title#, #content#,#updateType#,#packageName#,#resVer#,#resName#,#resSize#,#resUrl#,#urlMd5#,#resMd5#, NOW(), NOW())
+	</insert>
+	
+	<update id="update_slh_file_resource_info" parameterClass="ApkUpdateInfo" >
+	  UPDATE slh_file_resource_info SET modify_time = NOW()
+	  <dynamic>
+	  	 <isNotEmpty prepend="," property="appId">
+	      app_id = #appId#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="channelId">
+	      channel_id = #channelId#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="provinceId">
+	      province_id = #provinceId#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="cityId">
+	      city_id = #cityId#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="title">
+	      title = #title#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="content">
+	      content = #content#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="updateType">
+	      update_type = #updateType#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="packageName">
+	      package_name = #packageName#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="resVer">
+	      res_ver = #resVer#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="resName">
+	      res_name = #resName#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="resSize">
+	      res_size = #resSize#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="resUrl">
+	      res_url = #resUrl#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="urlMd5">
+	      url_md5 = #urlMd5#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="resMd5">
+	      res_md5 = #resMd5#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE id = #id#
+	</update>
+	
+	<delete id="delete_slh_file_resource_info" parameterClass="ApkUpdateInfo">
+		delete from slh_file_resource_info where id = #id#
+	</delete>
+	
+		<select id="select_slh_file_resource_info_by_id" resultMap="apkUpdateInforResultMap" parameterClass="ApkUpdateInfo">
+		SELECT
+			id,
+			app_id as appId,
+			(select app_name from slh_project_info where app_id=appId) appName,
+			channel_id,
+			province_id,
+			city_id,
+			title,
+			content,
+			update_type,
+			package_name,
+			res_ver,
+			res_name,
+			res_size,
+			res_url,
+			res_md5,
+			create_time,
+			modify_time,
+			(select province_name from slh_ip.tbl_province_info where id=province_id) provinceName,
+			(select city_name from slh_ip.tbl_city_info where id=city_id) cityName
+		FROM
+			slh_file_resource_info 
+		WHERE
+			id=#id#
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="apkUpdateInforResultMap" parameterClass="ApkUpdateInfo">
+		SELECT
+			id,
+			app_id as appId,
+			(select app_name from slh_project_info where app_id=appId) appName,
+			channel_id,
+			province_id,
+			city_id,
+			title,
+			content,
+			update_type,
+			package_name,
+			res_ver,
+			res_name,
+			res_size,
+			res_url,
+			res_md5,
+			create_time,
+			modify_time,
+			(select province_name from slh_ip.tbl_province_info where id=province_id) provinceName,
+			(select city_name from slh_ip.tbl_city_info where id=city_id) cityName
+		FROM
+			slh_file_resource_info 
+		WHERE
+			1 = 1
+		<dynamic>
+			<isNotEmpty prepend="and" property="id">
+				id &lt;&gt;#id#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="appId" >
+	        app_id = #appId#
+	        </isNotEmpty>
+		</dynamic>
+	</select>
+		
+</sqlMap>

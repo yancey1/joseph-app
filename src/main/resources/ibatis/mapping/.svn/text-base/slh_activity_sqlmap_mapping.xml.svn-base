@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_activity">
+
+	<typeAlias alias="activityDomain" type="com.yancey.manager.domain.ActivityDomain" />
+	
+	<resultMap id="activityMap" class="activityDomain" >
+	    <result column="id" property="id" />
+	    <result column="name" property="name" />
+	    <result column="ref_type" property="refType" />
+	    <result column="state" property="state" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	</resultMap>
+	
+	<sql id="slh_activity_query-conditions" >
+	    <dynamic>
+	      <isNotEmpty prepend="and" property="name" >
+	        name like concat('%',#name#,'%') 
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="activityDomain">
+		SELECT COUNT(1) FROM slh_activity a WHERE 1 = 1 
+		<include refid="slh_activity_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="activityMap" parameterClass="activityDomain">
+		SELECT 
+			id,
+			`name`,
+			ref_type,
+			state,
+			create_time,
+			modify_time
+		FROM slh_activity t
+		WHERE 1 = 1 
+		<include refid="slh_activity_query-conditions"/>
+		ORDER BY modify_time desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="activityMap" parameterClass="java.lang.Integer">
+		SELECT 
+			id,
+			`name`,
+			ref_type,
+			state,
+			create_time,
+			modify_time
+		FROM slh_activity
+		WHERE id=#id#
+	</select>
+	
+	<insert id="INSERT_ENTITY" parameterClass="activityDomain" >
+		INSERT INTO slh_activity(name,ref_type,state,create_time, modify_time)
+	 	VALUES(#name#,#refType#,#state#,NOW(), NOW())
+		<selectKey resultClass="java.lang.Integer" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<update id="UPDATE_ENTITY" parameterClass="activityDomain" >
+	  UPDATE slh_activity SET modify_time = NOW()
+	  <dynamic>
+	    <isNotEmpty prepend="," property="name">
+	      name = #name#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="refType">
+	      ref_type = #refType#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="state">
+	      state = #state#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE id = #id#
+	</update>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_activity where id = #id#
+	</delete>
+</sqlMap>

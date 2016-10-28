@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+    http://www.springframework.org/schema/aop 
+    http://www.springframework.org/schema/aop/spring-aop-2.0.xsd	
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+	http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd" default-autowire="byName" default-lazy-init="true">
+	
+	<mvc:annotation-driven />
+
+	<!-- 自动扫描包，可以写多个 -->
+	<context:component-scan base-package="com.yancey.manager.action" />
+	
+	<!-- 对某些静态资源，如css,图片等进行过滤 ,有引用 "/resources/**" 的路径引用转到工程的/resources/目录取资源 -->
+	<mvc:resources mapping="/resources/**" location="/resources/" />
+	
+	<!-- 避免IE执行AJAX时,返回JSON出现下载文件 -->
+	<bean id="mappingJacksonHttpMessageConverter"
+		class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+		<property name="supportedMediaTypes">
+			<list>
+				<value>text/html;charset=UTF-8</value>
+			</list>
+		</property>
+	</bean>
+	<!-- 启动Spring MVC的注解功能，完成请求和注解POJO的映射 -->
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<ref bean="mappingJacksonHttpMessageConverter" /><!-- json转换器 -->
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 针对freemarker的视图配置 -->
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+		<property name="cache" value="true" />
+		<property name="prefix" value="" />
+		<property name="suffix" value=".ftl" />
+		<property name="contentType" value="text/html;charset=UTF-8"></property>
+		<property name="requestContextAttribute" value="request" />
+		<property name="exposeSpringMacroHelpers" value="true" />
+		<property name="exposeRequestAttributes" value="true" />
+		<property name="exposeSessionAttributes" value="true" />
+	</bean>
+	
+	<!-- freemarker的配置 -->
+	<bean id="freemarkerConfig" 
+        class="com.yancey.manager.common.shiro.freemarker.ShiroTagFreeMarkerConfigurer"> 
+        <property name="templateLoaderPath" value="/WEB-INF/page/" /><!--模板的加载路径--> 
+        <property name="freemarkerSettings"> 
+            <props>
+                <prop key="template_update_delay">0</prop><!--模板刷新的时间，如果经常调试就用0 了--> 
+				<prop key="default_encoding">UTF-8</prop>
+                <prop key="url_escaping_charset">UTF-8</prop> 
+				<prop key="classic_compatible">true</prop>
+				<prop key="template_exception_handler">ignore</prop>
+                <prop key="locale">zh_CN</prop> 
+                <prop key="boolean_format">true,false</prop> 
+                <prop key="datetime_format">yyyy-MM-dd HH:mm:ss</prop> 
+                <prop key="date_format">yyyy-MM-dd</prop> 
+                <prop key="time_format">HH:mm:ss</prop> 
+				<prop key="number_format">#.####</prop>
+                <prop key="whitespace_stripping">true</prop> 
+                <prop key="auto_import">common/freemarker.ftl as fm</prop><!--这个是关键了，就是自动加载的模板，我们为了减少手动加载，大可以在这里让程序自动加载，但是又不能在这里写太多的文件名，所以就可以使用include指令，在index.ftl中include其他的ftl文件加载--> 
+            </props> 
+        </property> 
+    </bean> 
+	
+	<!-- kaptcha验证码 -->
+	<bean id="captchaProducer" class="com.google.code.kaptcha.impl.DefaultKaptcha">  
+        <property name="config">  
+            <bean class="com.google.code.kaptcha.util.Config">  
+                <constructor-arg>  
+                    <props>  
+                        <prop key="kaptcha.border">no</prop>  
+                        <prop key="kaptcha.border.color">105,179,90</prop>  
+                        <prop key="kaptcha.textproducer.font.color">blue</prop>  
+                        <prop key="kaptcha.image.width">250</prop>  
+                        <prop key="kaptcha.textproducer.font.size">80</prop>  
+                        <prop key="kaptcha.image.height">90</prop>  
+                        <prop key="kaptcha.session.key">code</prop>  
+                        <prop key="kaptcha.textproducer.char.length">4</prop>  
+                        <prop key="kaptcha.textproducer.font.names">宋体,楷体,微软雅黑</prop>  
+                    </props>  
+                </constructor-arg>  
+            </bean>  
+        </property>  
+    </bean>  
+    
+	<!-- 文件上传 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="UTF-8" />
+		<!-- 设置最大允许的大小(字节)。-1表示没有限制(默认) 1024*1024*10=10MB -->
+		<property name="maxUploadSize" value="104857600000" />
+		<!--被允许的最大的内存的大小，Default is 10240 bytes -->
+		<property name="maxInMemorySize" value="20480" />
+		<!-- 一个类似懒加载的属性.可以定义该属性.让解析文件的时候再抛异常,然后Controller中定义异常处理的方法 -->
+		<property name="resolveLazily" value="true" />
+	</bean>
+	
+	<!--配置拦截器, 多个拦截器,顺序执行 -->  
+	<mvc:interceptors>    
+    	<mvc:interceptor>    
+        	<!-- 匹配的是url路径， 如果不配置或/**,将拦截所有的Controller -->  
+	        <mvc:mapping path="/apk/**" /> 
+	        <mvc:mapping path="/newsInfo/**" />
+	        <mvc:mapping path="/jokeInfo/**" />
+	        <mvc:mapping path="/image/**" />  
+	        <mvc:mapping path="/lockScreen/**" /> 
+	        <mvc:mapping path="/pushTheme/**" /> 
+	        <mvc:mapping path="/wallPaper/**" /> 
+	        <mvc:mapping path="/menu/**" /> 
+	        <mvc:mapping path="/user/**" /> 
+	        <mvc:mapping path="/role/**" /> 
+	        <mvc:mapping path="/adver/**" /> 
+	        <mvc:mapping path="/bizApp/**" />
+	        <mvc:mapping path="/comment/**" /> 
+	        <mvc:mapping path="/gameData/**" /> 
+	        <mvc:mapping path="/hotSearchPar/**" /> 
+	        <mvc:mapping path="/hotWord/**" /> 
+	        <mvc:mapping path="/recommend/**" /> 
+	        <mvc:mapping path="/pageGame/**" /> 
+	        <mvc:mapping path="/pageGameDeploy/**" /> 
+	        <mvc:mapping path="/pageGameClassify/**" /> 
+	        <mvc:mapping path="/pageGameClassifyMapp/**" /> 
+	        <bean class="com.yancey.manager.action.CommonInterceptor"></bean>    
+    	</mvc:interceptor>  
+    	<!-- 当设置多个拦截器时，先按顺序调用preHandle方法，然后逆序调用每个拦截器的postHandle和afterCompletion方法 -->  
+	</mvc:interceptors>  
+
+</beans>

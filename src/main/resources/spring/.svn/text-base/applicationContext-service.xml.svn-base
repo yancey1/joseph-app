@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd" default-autowire="byName">
+	
+	<bean id="userService" class="com.yancey.manager.service.impl.UserServiceImpl">
+		<property name="userDAO" ref="userDAO"/>
+	</bean>
+	
+	<bean id="roleService" class="com.yancey.manager.service.impl.RoleServiceImpl">
+		<property name="roleDAO" ref="roleDAO"/>
+	</bean>
+	
+	<bean id="menuService" class="com.yancey.manager.service.impl.MenuServiceImpl">
+		<property name="menuDAO" ref="menuDAO"/>
+	</bean>
+	
+	<bean id="imageService" class="com.yancey.manager.service.impl.ImageServiceImpl">
+		<property name="imageDAO" ref="imageDAO"/>
+		<property name="localPath" value="${resource.local.path}"/>
+		<property name="publicUrl" value="${resource.public.url}"/>
+	</bean>
+	
+	<bean id="apkService" class="com.yancey.manager.service.impl.ApkServiceImpl">
+		<property name="apkDAO" ref="apkDAO"/>
+		<property name="imageService" ref="imageService"/>
+		<property name="localPath" value="${resource.local.path}"/>
+		<property name="publicUrl" value="${resource.public.url}"/>
+	</bean>
+	
+    <bean id="baseCmpCommonService" class="com.yancey.manager.service.impl.BaseCmpCommonServiceImpl">
+        <property name="baseCmpCommonDAO" ref="baseCmpCommonDAO" />
+    </bean>
+    
+    <bean id="systemLogService" class="com.yancey.manager.service.impl.log.SystemLogServiceImpl">
+	</bean>
+	
+	<bean id="weatherService" class="com.yancey.manager.service.impl.WeatherServiceImpl">
+		<property name="localPath" value="${resource.local.path}"/>
+		<property name="publicUrl" value="${resource.public.url}"/>
+	</bean>
+	
+	 <bean id="wallPaperService" class="com.yancey.manager.service.impl.WallPaperServiceImpl">
+        <property name="wallPaperDAO" ref="wallPaperDAO" />
+    </bean>
+    
+    <bean id="pageGameService" class="com.yancey.manager.service.impl.PageGameServiceImpl">
+		<property name="pageGameDAO" ref="pageGameDAO"/>
+	</bean>
+	
+    <bean id="adverService" class="com.yancey.manager.service.impl.AdverServiceImpl">
+		<property name="imageService" ref="imageService"/>
+	</bean>
+	
+   <!--  <bean id="lotteryDrawActivityService" class="com.yancey.manager.service.impl.LotteryDrawActivityServiceImpl">
+		<property name="imageService" ref="imageService"/>
+		<property name="lotteryDrawActivityDAO" ref="lotteryDrawActivityDAO"/>
+	</bean> -->
+</beans>

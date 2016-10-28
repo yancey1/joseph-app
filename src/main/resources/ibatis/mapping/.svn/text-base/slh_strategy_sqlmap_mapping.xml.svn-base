@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_strategy">
+
+	<typeAlias alias="strategyDomain" type="com.yancey.manager.domain.StrategyDomain" />
+	<typeAlias alias="Image" type="com.yancey.manager.domain.Image" />
+	
+	<resultMap id="strategyMap" class="strategyDomain" >
+	    <result column="id" property="id" />
+	    <result column="title" property="title" />
+	    <result column="user_image_id" property="userImageId" />
+	    <result column="author" property="author" />
+	    <result column="content" property="content" />
+	    <result column="publish_time" property="publishDate" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	    <result column="user_image_id" property="image" select="slh_image.selectImageByRefId" />
+	    <result column="id" property="images" select="slh_strategy.getImagesByStrategyId" />
+	</resultMap>
+	
+	
+	<resultMap id="StrategyImageResult" class="strategyDomain" >
+	   <result column="id" property="id" />
+	    <result column="title" property="title" />
+	    <result column="user_image_id" property="userImageId" />
+	    <result column="author" property="author" />
+	    <result column="content" property="content" />
+	    <result column="publish_time" property="publishDate" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	    <result column="user_image_id" property="image" select="slh_apk.getImageByJpgIconId"/>
+	     <result column="id" property="images" select="slh_strategy.getImagesByStrategyId" />
+	</resultMap> 
+	
+	<sql id="slh_strategy_query-conditions" >
+	    <dynamic>
+	      <isNotEmpty prepend="and" property="title" >
+	        title like concat('%',#title#,'%') 
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="strategyDomain">
+		SELECT COUNT(1) FROM slh_strategy_info a WHERE 1 = 1 
+		<include refid="slh_strategy_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="strategyMap" parameterClass="strategyDomain">
+		SELECT 
+			id,
+			`title`,
+			user_image_id,
+			author,
+			content,
+			publish_time,
+			create_time,
+			modify_time
+		FROM slh_strategy_info t
+		WHERE 1 = 1 
+		<include refid="slh_strategy_query-conditions"/>
+		ORDER BY publish_time desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="strategyMap" parameterClass="java.lang.Integer">
+		SELECT 
+			id,
+			`title`,
+			user_image_id,
+			author,
+			content,
+			publish_time,
+			create_time,
+			modify_time
+		FROM slh_strategy_info t
+		WHERE id=#id#
+	</select>
+	
+	
+	
+	<select id="select_slh_strategy" resultMap="StrategyImageResult" parameterClass="strategyDomain">
+		SELECT 
+			id,
+			`title`,
+			user_image_id,
+			author,
+			content,
+			publish_time,
+			create_time,
+			modify_time
+		FROM slh_strategy_info t
+		WHERE 1 = 1
+		<dynamic>
+			<isNotNull prepend="and" property="id">
+				id = #id#
+			</isNotNull>
+		</dynamic>
+	</select>
+	
+	
+	
+	
+	<insert id="INSERT_ENTITY" parameterClass="strategyDomain" >
+		INSERT INTO slh_strategy_info(title,user_image_id,author,content,publish_time,create_time, modify_time)
+	 	VALUES(#title#,#userImageId#,#author#,#content#,#publishDate#,NOW(), NOW())
+		<selectKey resultClass="java.lang.Integer" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<update id="UPDATE_ENTITY" parameterClass="strategyDomain" >
+	  UPDATE slh_strategy_info SET modify_time = NOW()
+	  <dynamic>
+	    <isNotEmpty prepend="," property="title">
+	      title = #title#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="userImageId">
+	      user_image_id = #userImageId#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="author">
+	      author = #author#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="content">
+	      content = #content#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="publishDate">
+	      publish_time = #publishDate#
+	    </isNotEmpty>
+	   
+	  </dynamic>
+	  WHERE id = #id#
+	</update>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_strategy_info where id = #id#
+	</delete>
+	
+	
+	<!--start apkImage图片    -->
+	<typeAlias alias="StrategyImage" type="com.yancey.manager.domain.StrategyImage" />
+
+	<insert id="insert_slh_strategy_image" parameterClass="StrategyImage" >
+	  INSERT INTO slh_strategy_image_mapping(
+		strategy_id,
+		image_id,
+		order_num
+	  )
+	 VALUES
+		(
+			#strategyId#, #imageId#, #orderNum#)
+	</insert>
+	
+	<delete id="delete_slh_strategy_image" parameterClass="StrategyImage">
+		DELETE
+		FROM
+			slh_strategy_image_mapping
+		WHERE 1 = 1 
+		<dynamic>
+			 <isNotNull prepend="and" property="strategyId">
+			 	strategy_id = #strategyId#
+			 </isNotNull>
+			 <isNotNull prepend="and" property="imageId">
+			 	image_id = #imageId#
+			 </isNotNull>
+		</dynamic>
+	</delete>
+	
+	
+	<select id="getImagesByStrategyId" resultClass="Image" parameterClass="java.lang.Integer">
+	 	SELECT
+			i.image_id AS imageId,
+			i.image_name AS imageName,
+			i.image_type AS imageType,
+			i.image_width AS imageWidth,
+			i.image_height AS imageHeight,
+			i.hd_image_url AS hdImgaeUrl,
+			i.nhd_image_url AS nhdImageUrl,
+			i.status AS status,
+			i.creator AS creator,
+			i.create_time AS createTime,
+			i.modify_time AS modifyTime
+		FROM
+			slh_image i,
+			slh_strategy_image_mapping a
+		WHERE
+			i.image_id = a.image_id
+		AND a.strategy_id = #value#
+	</select>
+	
+	<select id="getImageByJpgIconId" resultClass="Image" parameterClass="java.lang.Integer">
+	 	SELECT
+			i.image_id AS imageId,
+			i.image_name AS imageName,
+			i.image_type AS imageType,
+			i.image_width AS imageWidth,
+			i.image_height AS imageHeight,
+			i.hd_image_url AS hdImgaeUrl,
+			i.nhd_image_url AS nhdImageUrl,
+			i. status AS stastus,
+			i.creator AS creator,
+			i.create_time AS createTime,
+			i.modify_time AS modifyTime
+		FROM
+			slh_image i
+		WHERE
+			i.image_id = #value#
+	</select>
+</sqlMap>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_consult">
+
+	<typeAlias alias="consult" type="com.yancey.manager.domain.ConsultDomain" />
+	
+	<resultMap id="consultResult" class="consult" >
+	    <result column="id" property="id" />
+	    <result column="name" property="name" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	</resultMap>
+	
+	<sql id="slh_consult_query-conditions" >
+	    <dynamic>
+	      <isNotEmpty prepend="and" property="name" >
+	        name like concat('%',#name#,'%') 
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="consult">
+		SELECT COUNT(1) FROM slh_consult_info a WHERE 1 = 1 
+		<include refid="slh_consult_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="consultResult" parameterClass="consult">
+		SELECT 
+		id,
+		name,
+		create_time,
+		modify_time
+		FROM slh_consult_info
+		WHERE 1 = 1 
+		<include refid="slh_consult_query-conditions"/>
+		ORDER BY modify_time DESC
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="consultResult" parameterClass="consult">
+		SELECT 
+		id,
+		name,
+		create_time,
+		modify_time
+		FROM slh_consult_info
+		WHERE 1 = 1 
+		<dynamic>
+			<isNotEmpty prepend="and" property="name">
+				name =#name#
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY modify_time DESC
+		
+	</select>
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="consultResult" parameterClass="java.lang.Integer">
+		SELECT 
+		id,
+		name,
+		create_time,
+		modify_time
+		FROM slh_consult_info
+		WHERE id=#id#
+	</select>
+	
+	<insert id="INSERT_ENTITY" parameterClass="consult" >
+		INSERT INTO slh_consult_info(name,creator,create_time, modify_time)
+	 	VALUES(#name#,#creator#,NOW(), NOW())
+		<selectKey resultClass="java.lang.Integer" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<update id="UPDATE_ENTITY" parameterClass="consult" >
+	  UPDATE slh_consult_info SET modify_time = NOW()
+	  <dynamic>
+	    <isNotEmpty prepend="," property="name">
+	      name = #name#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE id = #id#
+	</update>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_consult_info where id = #id#
+	</delete>
+	
+</sqlMap>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_ranking">
+
+	<typeAlias alias="ranking" type="com.yancey.manager.domain.RankDomain" />
+	
+	<resultMap id="rankingResult" class="ranking" >
+	    <result column="id" property="id" />
+	    <result column="type" property="type" />
+	    <result column="order_num" property="orderNum" />
+	    <result column="creator" property="creator" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	</resultMap>
+	
+	<sql id="slh_ranking_query-conditions" >
+	    <dynamic>
+	      <isNotEmpty prepend="and" property="type" >
+	        type  =#type#
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="ranking">
+		SELECT COUNT(1) FROM slh_ranking a WHERE 1 = 1 
+		<include refid="slh_ranking_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="rankingResult" parameterClass="ranking">
+		SELECT 
+		id,
+		type,
+		creator,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_ranking
+		WHERE 1 = 1 
+		<include refid="slh_ranking_query-conditions"/>
+		ORDER BY modify_time asc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="rankingResult" parameterClass="ranking">
+		SELECT 
+		id,
+		type,
+		creator,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_ranking
+		WHERE 1 = 1 
+		<dynamic>
+			<isNotEmpty prepend="and" property="type">
+				type =#type#
+			</isNotEmpty>
+	    </dynamic>
+	</select>
+	
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="rankingResult" parameterClass="java.lang.Integer">
+		SELECT 
+		id,
+		type,
+		creator,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_ranking
+		WHERE id=#id#
+	</select>
+	
+	<insert id="INSERT_ENTITY" parameterClass="ranking" >
+		INSERT INTO slh_ranking(type,creator,order_num,create_time, modify_time)
+	 	VALUES(#type#,#creator#,#orderNum#,NOW(), NOW())
+		<selectKey resultClass="java.lang.Integer" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<update id="UPDATE_ENTITY" parameterClass="ranking" >
+	  UPDATE slh_ranking SET modify_time = NOW()
+	  <dynamic>
+	    <isNotEmpty prepend="," property="orderNum">
+	      order_num = #orderNum#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE id = #id#
+	</update>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_ranking where id = #id#
+	</delete>
+	
+</sqlMap>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_ref_comment_mapp">
+
+	<typeAlias alias="refCommentMapp" type="com.yancey.manager.domain.RefCommentDomain" />
+	
+	<resultMap id="refCommentMappResult" class="refCommentMapp" >
+	    <result column="id" property="id" />
+	    <result column="type" property="type" />
+	    <result column="ref_id" property="refId" />
+	    <result column="user_name" property="userName" />
+	    <result column="score" property="score" />
+	    <result column="comment_time" property="commentTime" />
+	    <result column="comment_desc" property="commentDesc" />
+	    <result column="is_top" property="isTop" />
+	    <result column="is_hide" property="isHide" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	</resultMap>
+	
+	<insert id="INSERT_ENTITY" parameterClass="refCommentMapp" >
+		INSERT INTO slh_ref_comment_mapping(type,ref_id,user_name,score,comment_time,comment_desc,is_top,is_hide,create_time, modify_time)
+	 	VALUES(#type#,#refId#,#userName#,#score#,NOW(),#commentDesc#,#isTop#,#isHide#,NOW(), NOW())
+		<selectKey resultClass="java.lang.Integer" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultClass="refCommentMapp" parameterClass="refCommentMapp">
+		SELECT 
+		id,type,ref_id,user_name,score,comment_time,comment_desc,is_top,is_hide,create_time, modify_time
+		FROM slh_ref_comment_mapping
+		WHERE 1=1 
+		<isNotEmpty prepend="and" property="id">
+			ref_id =#id#
+		</isNotEmpty>
+		and type=2
+	</select>
+</sqlMap>

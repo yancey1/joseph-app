@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_left_slip_data">
+
+	<typeAlias alias="leftSlipData" type="com.yancey.manager.domain.LeftSlipData" />
+	
+	<resultMap class="leftSlipData" id="leftSlipDataMap">
+		<result property="bizDate" column="biz_date"/>
+		<result property="channelId" column="channel_id"/>
+		<result property="bizAppId" column="biz_app_id"/>
+		<result property="refId" column="ref_id"/>
+		<result property="refName" column="ref_name"/>
+		<result property="pushName" column="pushName"/>
+		<result property="refType" column="ref_type"/>
+		<result property="clickPv" column="click_pv"/>
+		<result property="clickUv" column="click_uv"/>
+		<result property="createTime" column="create_time"/>
+	</resultMap>
+	
+	<sql id="left_slip_data_query_conditions" >
+	     <dynamic>
+	    	<isNotEmpty prepend="and" property="startDate">
+	    			<![CDATA[
+	    				biz_date >= #startDate#
+	    			]]>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="endDate">
+	    			<![CDATA[
+	    				biz_date <= #endDate#
+	    			]]>
+	    	</isNotEmpty>
+	     	<isNotEmpty property="channelId" prepend="and">
+		     		channel_id =#channelId# 
+	     	</isNotEmpty>
+	     	<isNotEmpty property="bizAppId" prepend="and">
+		     		biz_app_id = #bizAppId#
+	     	</isNotEmpty>
+	    </dynamic>
+	</sql>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="leftSlipDataMap" parameterClass="leftSlipData">
+		select 
+			biz_date,
+			channel_id,
+			biz_app_id,
+			ref_id,
+			ref_type,
+			(select push_name from slh_push_theme where push_type=t.ref_type) as pushName,
+			ref_name,
+			click_pv,
+			click_uv,
+			create_time
+		from slh_lock_screen_warehourse.slh_left_slip_data_show t
+		where 1=1
+		<include refid="left_slip_data_query_conditions"/>
+		order by biz_date desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="leftSlipDataMap" parameterClass="leftSlipData">
+		select 
+			biz_date,
+			channel_id,
+			biz_app_id,
+			ref_id,
+			ref_type,
+			ref_name,
+			(select push_name from slh_push_theme where push_type=t.ref_type) as pushName,
+			click_pv,
+			click_uv,
+			create_time
+		from slh_lock_screen_warehourse.slh_left_slip_data_show t
+		where 1=1
+		<isNotEmpty prepend="and" property="startDate">
+			biz_date &gt;= #startDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endDate">
+			biz_date &lt;= #endDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="channelId">
+			channel_id = #channelId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="bizAppId">
+			biz_app_id = #bizAppId#
+		</isNotEmpty>
+		order by create_time desc
+	</select>
+	
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer" parameterClass="leftSlipData">
+		select 
+		count(1)
+		from slh_lock_screen_warehourse.slh_left_slip_data_show
+		where 1=1
+		<include refid="left_slip_data_query_conditions"/>
+	</select>
+	
+	
+	
+	
+	<select id="select_slh_leftSlip_list" resultMap="leftSlipDataMap" parameterClass="leftSlipData">
+		select 
+			biz_date,
+			channel_id,
+			biz_app_id,
+			ref_id,
+			ref_type,
+			ref_name,
+			(select push_name from slh_push_theme where push_type=t.ref_type) as pushName,
+			click_pv,
+			click_uv,
+			create_time
+		from slh_lock_screen_warehourse.slh_left_slip_data_show t
+		where 1=1
+		<include refid="left_slip_data_query_conditions"/>
+		order by biz_date desc
+	</select>
+	
+</sqlMap>

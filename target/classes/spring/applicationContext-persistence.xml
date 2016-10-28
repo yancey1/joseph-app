@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd 
+    http://www.springframework.org/schema/aop 
+    http://www.springframework.org/schema/aop/spring-aop-4.0.xsd	
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+	http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd" default-autowire="byName" default-lazy-init="true">
+
+	<bean id="lockDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		abstract="false"  lazy-init="false" autowire="default"
+		destroy-method="close">
+		<property name="driverClass" value="${lock.jdbc.driver}" />
+		<property name="jdbcUrl" value="${lock.jdbc.url}" />
+		<property name="user" value="${lock.jdbc.username}" />
+		<property name="password" value="${lock.jdbc.password}" />
+		<property name="minPoolSize" value="${lock.jdbc.minPoolSize}" />
+		<property name="maxPoolSize" value="${lock.jdbc.maxPoolSize}" />
+		<property name="maxIdleTime" value="${lock.jdbc.maxIdleTime}" />
+		<property name="initialPoolSize" value="${lock.jdbc.initialPoolSize}" />
+		<property name="numHelperThreads" value="${lock.jdbc.numHelperThreads}" />
+		<property name="idleConnectionTestPeriod" value="${lock.jdbc.idleConnectionTestPeriod}" />
+		<property name="preferredTestQuery" value="${lock.jdbc.preferredTestQuery}" />
+	</bean>
+	
+
+	<bean id="lockSqlMap" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocations">
+			<list>
+				<value>classpath:ibatis/sqlmap-config.xml</value>
+			</list>
+		</property>
+		<property name="dataSource">
+			<ref bean="lockDataSource" />
+		</property>
+	</bean>
+	
+
+	<!-- 数据库路由规则配置 -->
+	<bean id="dbRouteConfig" class="edu.hziee.common.dbroute.config.DBRouteConfig">
+		<property name="sqlMapList">
+			<map>
+				<entry key="lockDB">
+					<ref bean="lockSqlMap"></ref>
+				</entry>
+			</map>
+		</property>
+		<property name="defaultNodeNameList">
+			<list>
+				<value>lockDB</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="lockDefaultDB" class="edu.hziee.common.dbroute.config.DBRoute">
+		<constructor-arg value="lockDB" />
+	</bean>
+
+	<bean id="baseDAO" class="edu.hziee.common.dbroute.BaseDAO">
+		<property name="dbRouteConfig" ref="dbRouteConfig" />
+		<property name="defaultDB" ref="lockDefaultDB" />
+	</bean>
+	
+	<!-- 自动扫描组件，这里要把web下面的 controller去除，他们是在applicationContext-action.xml中配置的，如果不去除会影响事务管理的-->
+	<context:component-scan base-package="com.yancey.manager">
+		<context:exclude-filter type="regex" expression="com.yancey.manager.action.*"/>
+	</context:component-scan>
+	
+	
+	<!-- =================================  Start  事务控制 ================================== -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="lockDataSource"></property>
+	</bean>
+	
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="updateResourceListMapping" rollback-for="Exception"
+				propagation="REQUIRED" />
+			<tx:method name="deleteNewsInfo" rollback-for="Exception"
+				propagation="REQUIRED" />	
+			<tx:method name="deleteJokeInfo" rollback-for="Exception"
+				propagation="REQUIRED" />	
+			<tx:method name="deleteLockScreen" rollback-for="Exception"
+				propagation="REQUIRED" />	
+			<tx:method name="deleteWallPaper" rollback-for="Exception"
+				propagation="REQUIRED" />	
+			<tx:method name="savePageGame" rollback-for="Exception"
+				propagation="REQUIRED" />	
+			<tx:method name="modifyPageGame" rollback-for="Exception"
+				propagation="REQUIRED" />	
+			<tx:method name="saveApk" rollback-for="Exception"
+				propagation="REQUIRED" />	
+			<tx:method name="modifyApk" rollback-for="Exception"
+				propagation="REQUIRED" />	
+			<tx:method name="modifyBizApp" rollback-for="Exception"
+				propagation="REQUIRED" />			
+		</tx:attributes>
+	</tx:advice>	
+	
+	<aop:config proxy-target-class="true">
+		<aop:pointcut id="servicePointcut"
+			expression="execution(* com.yancey.manager.service.*.*(..))" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="servicePointcut" />
+	</aop:config>
+	<!-- =================================  End  事务控制 ================================== -->
+	
+</beans>

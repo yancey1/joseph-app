@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_topic_info">
+
+	<typeAlias alias="topic" type="com.yancey.manager.domain.TopicinfoDomain" />
+	
+	<resultMap id="topicInfoResult" class="topic" >
+	    <result column="topic_id" property="topicId" />
+	    <result column="id" property="id" />
+	    <result column="topic_name" property="topicName" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	</resultMap>
+	
+	<sql id="slh_topic_query-conditions" >
+	    <dynamic>
+	      <isNotEmpty prepend="and" property="topicName">
+	        topic_name =#topicName#
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="topic">
+		SELECT COUNT(1) FROM slh_topic_info a WHERE 1 = 1 
+		<include refid="slh_topic_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="topicInfoResult" parameterClass="topic">
+		SELECT 
+			id,
+			topic_id,
+			topic_name,
+			create_time,
+			modify_time
+		FROM slh_topic_info
+		WHERE 1 = 1 
+		<include refid="slh_topic_query-conditions"/>
+		ORDER BY modify_time
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="topicInfoResult" parameterClass="topic">
+		SELECT 
+			id,
+			topic_id,
+			topic_name,
+			create_time,
+			modify_time
+		FROM slh_topic_info
+		WHERE 1 = 1 
+		<dynamic>
+			<isNotEmpty  prepend="and" property="topicName">
+				topic_name=#topicName#
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY modify_time
+	</select>
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="topicInfoResult" parameterClass="java.lang.Integer">
+		SELECT 
+		id,
+			topic_id,
+			topic_name,
+			create_time,
+			modify_time
+		FROM slh_topic_info
+		WHERE id=#id#
+	</select>
+	
+	<insert id="INSERT_ENTITY" parameterClass="topic" >
+		INSERT INTO slh_topic_info(topic_id,topic_name,create_time, modify_time)
+	 	VALUES(#topicId#,#topicName#,NOW(), NOW())
+	</insert>
+	<update id="UPDATE_ENTITY" parameterClass="topic" >
+	  UPDATE slh_topic_info SET modify_time = NOW()
+	  <dynamic>
+	  	<isNotEmpty prepend="," property="topicName">
+	      topic_name = #topicName#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE id = #id#
+	</update>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_topic_info where id = #id#
+	</delete>
+	
+</sqlMap>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_win_record">
+
+	<typeAlias alias="winRecordDomain" type="com.yancey.manager.domain.WinRecordDomain" />
+	
+	<resultMap id="winRecordMap" class="winRecordDomain" >
+	    <result column="id" property="id" />
+	    <result column="phone" property="phone" />
+	    <result column="win_name" property="winName" />
+	    <result column="activity_id" property="activityId" />
+	    <result column="prize_id" property="prizeId" />
+	    <result column="name" property="name" />
+	    <result column="state" property="state" />
+	    <result column="data_type" property="dataType" />
+	    <result column="win_time" property="winTimeDate" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	</resultMap>
+	<resultMap id="winRecordResultMap" class="winRecordDomain" >
+	    <result column="id" property="id" />
+	    <result column="phone" property="phone" />
+	    <result column="win_name" property="winName" />
+	    <result column="activity_id" property="activityId" />
+	    <result column="prize_id" property="prizeId" />
+	    <result column="name" property="name" />
+	    <result column="state" property="state" />
+	    <result column="win_time" property="winTime" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	</resultMap>
+	
+	<sql id="slh_win_record_query-conditions" >
+	    <dynamic>
+	      <isNotEmpty prepend="and" property="winName" >
+	        win_name like concat('%',#winName#,'%') 
+	      </isNotEmpty>
+	      <isNotEmpty prepend="and" property="state" >
+	        state =#state#
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="winRecordDomain">
+<!-- 		SELECT COUNT(1) FROM slh_win_record a WHERE 1 = 1 
+ -->		
+		SELECT
+			COUNT(1)
+		FROM
+			slh_win_record t1,
+			slh_lottery_draw_activity t2
+		WHERE
+			1=1 and 
+			t1.activity_id = t2.id
+		<include refid="slh_win_record_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="winRecordResultMap" parameterClass="winRecordDomain">
+		SELECT
+			t1.id,
+			t1.phone,
+			t1.win_name,
+			t1.activity_id,
+			t1.state,
+			t1.win_time,
+			t1.prize_id,
+			t1.data_type,
+			t2.`name`,
+			t1.create_time,
+			t1.modify_time
+		FROM
+			slh_win_record t1,
+			slh_lottery_draw_activity t2
+		WHERE
+			
+			t1.activity_id = t2.id
+		and 1=1 
+		<include refid="slh_win_record_query-conditions"/>
+		ORDER BY t1.win_time desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	
+	<select id="select_slh_win_record_list" resultMap="winRecordResultMap" parameterClass="winRecordDomain">
+		SELECT
+			t1.id,
+			t1.phone,
+			t1.win_name,
+			t1.activity_id,
+			t1.state,
+			t1.win_time,
+			t1.prize_id,
+			t1.data_type,
+			t2.`name`,
+			t1.create_time,
+			t1.modify_time
+		FROM
+			slh_win_record t1,
+			slh_lottery_draw_activity t2
+		WHERE
+			1=1 and 
+			t1.activity_id = t2.id
+		
+		ORDER BY t1.win_time desc
+	</select>
+
+	<select id="SELECT_ENTITY_BY_ID" resultMap="winRecordResultMap" parameterClass="java.lang.Integer">
+		SELECT
+			t1.id,
+			t1.phone,
+			t1.win_name,
+			t1.activity_id,
+			t1.state,
+			t1.win_time,
+			t1.prize_id,
+			t1.data_type,
+			t2.`name`,
+			t1.create_time,
+			t1.modify_time
+		FROM
+			slh_win_record t1,
+			slh_lottery_draw_activity t2
+		WHERE
+			1=1 and 
+			t1.activity_id = t2.id
+		and  t1.id=#id#
+	</select>
+	
+	<update id="UPDATE_ENTITY" parameterClass="winRecordDomain" >
+	  UPDATE slh_win_record SET modify_time = NOW()
+	  <dynamic>
+	    <isNotEmpty prepend="," property="state">
+	      state = #state#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE id = #id#
+	</update>
+	
+	
+	
+	<insert id="INSERT_ENTITY" parameterClass="winRecordDomain" >
+		INSERT INTO slh_win_record(phone,activity_id,prize_id,data_type,win_name,state,win_time,create_time, modify_time)
+	 	VALUES(#phone#,#activityId#,#prizeId#,#dataType#,#winName#,#state#,#winTimeDate#,NOW(), NOW())
+		<selectKey resultClass="java.lang.Integer" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+</sqlMap>

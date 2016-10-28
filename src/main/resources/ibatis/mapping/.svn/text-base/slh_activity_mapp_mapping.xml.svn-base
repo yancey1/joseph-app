@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_activity_mapping">
+
+	<typeAlias alias="activityMappDomain" type="com.yancey.manager.domain.ActivityMappDomain" />
+	
+	<resultMap class="activityMappDomain" id="activityMappDomainMap">
+		<result property="id" column="id"/>
+		<result property="refId" column="ref_id"/>
+		<result property="refType" column="ref_type"/>
+		<result property="desc" column="desc"/>
+		<result property="createTime" column="create_time"/>
+		<result property="modifyTime" column="modify_time"/>
+		<result property="lotteryDrawActivity" column="ref_id" select="slh_lottery_draw_activity.SELECT_ENTITY_BY_ID"/>
+	</resultMap>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="activityMappDomainMap" parameterClass="activityMappDomain">
+		select 
+			id,
+			ref_id,
+			ref_type,
+			`desc`,
+			create_time,
+			modify_time
+		from slh_activity_mapping
+		where 1=1
+		<dynamic>
+			<isNotEmpty prepend="and" property="id">
+				id=#id#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="refType">
+				ref_type=#refType#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="refId">
+				ref_id=#refId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_activity_mapping where id=#id#
+	</delete>	
+		
+	<insert id="INSERT_ENTITY" parameterClass="activityMappDomain">
+		insert into slh_activity_mapping(id,ref_id,ref_type,`desc`,create_time,modify_time)
+		values (#id#,#refId#,#refType#,#desc#,now(),now())
+	</insert>	
+	
+	<delete id="deleteEntityAll" parameterClass="activityMappDomain">
+		delete from slh_activity_mapping where id=#id#
+	</delete>	
+	
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="activityMappDomainMap" parameterClass="java.lang.Integer">
+		SELECT 
+			id,ref_id,ref_type,`desc`,create_time,modify_time
+		FROM slh_activity_mapping
+		WHERE ref_id=#id#
+	</select>
+</sqlMap>

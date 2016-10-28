@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_recommend">
+
+	<typeAlias alias="recommendDomain" type="com.yancey.manager.domain.RecommendDomain" />
+	
+	<resultMap class="recommendDomain" id="recommendMap">
+		<result property="id" column="id"/>
+		<result property="displayMech" column="display_mech"/>
+		<result property="type" column="type"/>
+		<result property="creator" column="creator"/>
+	    <result property="createTime" column="create_time" />
+	    <result property="modifyTime" column="modify_time" />
+	</resultMap>
+	<resultMap class="recommendDomain" id="recommendMapResult">
+		<result property="id" column="id"/>
+		<result property="type" column="type"/>
+		<result property="refId" column="ref_id"/>
+	    <result property="orderNum" column="order_num" />
+	    <result column="ref_id" property="pageGameDomain" select="slh_page_game.SELECT_ENTITY_BY_ID" />
+	</resultMap>
+	<resultMap class="recommendDomain" id="recommendApkResult">
+		<result property="id" column="id"/>
+		<result property="type" column="type"/>
+		<result property="refId" column="ref_id"/>
+	    <result property="orderNum" column="order_num" />
+	    <result column="ref_id" property="apk" select="slh_apk.SELECT_ENTITY_BY_ID" />
+	</resultMap>
+	
+	<sql id="recommend_query_conditions" >
+	    <dynamic>
+	     	<isNotEmpty property="type" prepend="and">
+		     		type =#type#
+	     	</isNotEmpty>
+	    </dynamic>
+	</sql>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="recommendMap" parameterClass="recommendDomain">
+		select 
+		id,
+		display_mech,
+		type,
+		creator,
+		create_time,
+		modify_time
+		from slh_recommend
+		where 1=1
+		<include refid="recommend_query_conditions"/>
+		order by modify_time desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer" parameterClass="recommendDomain">
+		select 
+		count(1)
+		from slh_recommend 
+		where 1=1
+		<include refid="recommend_query_conditions"/>
+	</select>
+		
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_recommend_mapping where recommend_id=#id#
+	</delete>	
+	
+	<delete id="delete_recommend_by_id" parameterClass="java.util.Map">
+		delete from slh_recommend where id=#id#
+	</delete>	
+		
+	<insert id="INSERT_ENTITY" parameterClass="recommendDomain">
+		insert into slh_recommend_mapping(recommend_id,ref_id,order_num)
+		values (#recommendId#,#refId#,#orderNum#)
+	</insert>	
+	
+	<insert id="insert_recommend" parameterClass="recommendDomain">
+		insert into slh_recommend(type,display_mech,creator,create_time,modify_time)
+		values (#type#,#displayMech#,#creator#,now(),now())
+	</insert>	
+	
+	
+	<!--页游部署表 -->
+	<select id="GET_DELEPLOY_ENTITY_LIST" resultMap="recommendMapResult" parameterClass="recommendDomain">
+	SELECT
+			t1.type,
+			t1.id,
+			t2.ref_id,
+			t2.order_num
+		FROM
+			slh_recommend t1,
+			slh_recommend_mapping t2
+		WHERE
+			t1.id = t2.recommend_id
+		AND t1.id =#id#
+		AND t1.type=#type#
+	</select>
+	<select id="GET_DELEPLOY_APK_LIST" resultMap="recommendApkResult" parameterClass="recommendDomain">
+	SELECT
+			t1.type,
+			t1.id,
+			t2.ref_id,
+			t2.order_num
+		FROM
+			slh_recommend t1,
+			slh_recommend_mapping t2
+		WHERE
+			t1.id = t2.recommend_id
+		AND t1.id =#id#
+		AND t1.type=#type#
+	</select>
+	
+	
+	
+	<update id="update_recommend" parameterClass="recommendDomain">
+		update  slh_recommend set
+		modify_time=NOW()
+		<dynamic>
+			    <isNotEmpty prepend="," property="displayMech">
+			      display_mech = #displayMech#
+			    </isNotEmpty>
+			    <isNotEmpty prepend="," property="type">
+			      type = #type#
+			    </isNotEmpty>
+		  </dynamic>
+		where id=#id#
+	</update>
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="recommendMap" parameterClass="java.lang.Integer">
+		select 
+			id,
+			type,
+			display_mech,
+			creator,
+			create_time,
+			modify_time
+		from slh_recommend
+		where id=#id#
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="recommendMap" parameterClass="recommendDomain">
+		select 
+			id,
+			type,
+			display_mech,
+			creator,
+			create_time,
+			modify_time
+			from slh_recommend
+		where 1=1
+		<dynamic>
+			<isNotEmpty property="type" prepend="and">
+		     		type =#type# 
+	     	</isNotEmpty>
+			<isNotEmpty property="displayMech" prepend="and">
+		     	display_mech = #displayMech#
+	     	</isNotEmpty>
+		</dynamic>
+		ORDER BY modify_time DESC
+	</select>
+	
+		<select id="checkAssembly" resultMap="recommendMap" parameterClass="recommendDomain">
+		select 
+			id,
+			name,
+			type,
+			creator,
+			create_time,
+			modify_time
+			from slh_recommend
+		where 1=1
+		<dynamic>
+			<isNotEmpty prepend="and" property="id">
+				id &lt;&gt;#id#
+			</isNotEmpty>
+			<isNotEmpty property="name" prepend="and">
+		     	name =#name#
+	     	</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="select_entity_by_getid" resultClass="recommendDomain" parameterClass="recommendDomain">
+		select
+			recommend_id,
+			ref_id,
+			order_num
+		FROM slh_recommend_mapping
+		WHERE 1=1 
+		<dynamic>
+			<isNotEmpty prepend="and" property="refId">
+				ref_id=#refId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<delete id="deleteEntityAll" parameterClass="recommendDomain">
+		delete 
+		from 
+		slh_recommend_mapping
+		 where
+		ref_id=#refId#
+		and 
+		recommend_id in (select id from slh_recommend where type=2)
+	</delete>
+	
+	<delete id="deleteObjByMap" parameterClass="java.util.Map">
+		delete 
+		from 
+		slh_recommend_mapping
+		where
+		ref_id=#gameId#
+		and 
+		recommend_id in(select id from slh_recommend where type=1)
+	</delete>
+</sqlMap>

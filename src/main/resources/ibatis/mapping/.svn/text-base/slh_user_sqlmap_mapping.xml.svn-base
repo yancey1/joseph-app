@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_user">
+
+	<typeAlias alias="User" type="com.yancey.manager.domain.User" />
+	<typeAlias alias="Company" type="com.yancey.manager.domain.Company" />
+	<typeAlias alias="UserForm" type="com.yancey.manager.form.UserForm" />
+	<typeAlias alias="UserRole" type="com.yancey.manager.domain.UserRole" />
+	<typeAlias alias="Role" type="com.yancey.manager.domain.Role" />
+	<typeAlias alias="UserMarket" type="com.yancey.manager.domain.UserMarket" />
+	<typeAlias alias="UserChannel" type="com.yancey.manager.domain.UserChannel" />
+	<typeAlias alias="ChannelForm" type="com.yancey.manager.form.ChannelForm" />
+	<typeAlias alias="MenuForm" type="com.yancey.manager.form.MenuForm" />
+	
+	<resultMap id="abatorgenerated_UserResult" class="User" >
+	    <result column="user_id" property="userId" />
+	    <result column="user_name" property="userName" />
+	    <result column="nickname" property="nickname" />
+	    <result column="password" property="password" />
+	    <result column="status" property="status" />
+	    <result column="description" property="description" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	    <result column="py_user_name" property="pyUserName" />
+	    <result column="py_password" property="pyPassword" />
+	    <result column="user_id" property="roles" select="slh_user.getRolesByUserId"/>
+	    <result column="user_id" property="markets" select="slh_user.getMarketsByUserId"/>
+	    <result column="company_id" property="company" select="slh_user.getCompanyByCompanyId"/>
+	</resultMap>
+	
+	<sql id="slh_user.abatorgenerated_slh_user_query_conditions" >
+	    <dynamic>
+	      <isNotNull prepend="and" property="nickname" >
+	        nickname = #nickname#
+	      </isNotNull>
+	      <isNotNull property="status" >
+	      	<isNotEmpty prepend="and" property="status">
+		        status = #status#
+	      	</isNotEmpty>
+	      </isNotNull>
+	      <isNotNull prepend="and" property="description" >
+	        description = #description#
+	      </isNotNull>
+	    </dynamic>
+	</sql>
+	<select id="getRolesByUserId" resultClass="Role" parameterClass="java.lang.Integer">
+		SELECT r.role_id AS roleId,r.role_name AS roleName,r.create_time AS createTime,r.description,r.modify_time As modifyTime,r.roles 
+		FROM slh_role r,slh_user_role ur 
+		WHERE r.role_id=ur.role_id and ur.user_id=#value#
+	</select>
+	<select id="getMarketsByUserId" resultClass="UserMarket" parameterClass="java.lang.Integer">
+		SELECT m.market_id AS marketId,m.pindao_id AS pindaoId from slh_user_market m
+		WHERE m.user_id=#value#
+	</select>
+	<select id="getCompanyByCompanyId" resultClass="Company" parameterClass="java.lang.String">
+		SELECT company_id AS companyId,company_name AS companyName from slh_company where company_id = #value#
+	</select>
+	
+	<select id="getChannelFormByUserId" resultClass="ChannelForm" parameterClass="java.lang.Integer">
+	select c.id as id,c.channel_id as channelId, c.channel_name as channelName from slh_channel c,slh_user_channel uc where c.id = uc.channel_id and uc.user_id = #value#
+	</select>
+
+	<select id="select_slh_user_page_list_count" resultClass="java.lang.Integer"	parameterClass="UserForm">
+		SELECT COUNT(1) FROM slh_user u 
+		WHERE 1 = 1
+		<include refid="slh_user.abatorgenerated_slh_user_query_conditions"/>
+		<dynamic>
+			<isNotNull prepend="and" property="userName" >
+		        user_name like '%$userName$%'
+		     </isNotNull>
+		     <isNotNull prepend="and" property="rId" >
+		        u.user_id in(select r.user_id from slh_user_role r where r.role_id = #rId#)
+		    </isNotNull>
+		</dynamic>
+	</select>
+	<select id="select_slh_user_page_list" resultMap="abatorgenerated_UserResult" parameterClass="UserForm">
+		SELECT u.user_id, u.user_name, u.nickname, u.password, u.status,u.py_user_name,u.py_password, u.description,u.company_id, u.create_time, u.modify_time
+		FROM slh_user u 
+		WHERE u.user_id 
+		<include refid="slh_user.abatorgenerated_slh_user_query_conditions"/>
+		<dynamic>
+			<isNotNull prepend="and" property="userName" >
+		        u.user_name like '%$userName$%'
+		    </isNotNull>
+		    <isNotNull prepend="and" property="rId" >
+		        u.user_id in(select r.user_id from slh_user_role r where r.role_id = #rId#)
+		    </isNotNull>
+		</dynamic>
+		ORDER BY modify_time DESC
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows#
+	</select>
+	<select id="select_slh_user_list" resultMap="abatorgenerated_UserResult" parameterClass="UserForm">
+		SELECT user_id, user_name, nickname, password, status,py_user_name,py_password, description,company_id, create_time, modify_time
+		FROM slh_user
+		WHERE 1 = 1
+		<include refid="slh_user.abatorgenerated_slh_user_query_conditions"/>
+		<dynamic>
+			<isNotNull prepend="and" property="companyId" >
+		        company_id like '%$companyId$%'
+		     </isNotNull>
+		</dynamic>
+	</select>
+	<select id="select_slh_user" resultMap="abatorgenerated_UserResult" parameterClass="UserForm">
+		SELECT user_id, user_name, nickname, password, status,py_user_name,py_password, description,company_id, create_time, modify_time
+		FROM slh_user
+		WHERE 1 = 1
+		<include refid="slh_user.abatorgenerated_slh_user_query_conditions"/>
+		<dynamic>
+			<isNotNull prepend="and" property="userId">
+				user_id = #userId#
+			</isNotNull>
+			<isNotNull prepend="and" property="userName" >
+		        user_name = #userName#
+		     </isNotNull>
+		</dynamic>
+	</select>
+	
+	<insert id="insert_slh_user" parameterClass="UserForm" >
+	  INSERT INTO slh_user (user_name, nickname, password, status, description,py_user_name,py_password,company_id, create_time, modify_time)
+	  VALUES (#userName#, #nickname#, #password#, #status#,#description#,#pyUserName#,#pyPassword#,#companyId#, NOW(), NOW())
+	  <selectKey resultClass="java.lang.Integer" keyProperty="userId" >
+	    SELECT LAST_INSERT_ID()
+	  </selectKey>
+	</insert>
+	
+	<update id="update_slh_user" parameterClass="UserForm" >
+	  UPDATE slh_user SET modify_time = NOW()
+	  <dynamic>
+	    <isNotNull prepend="," property="userName">
+	      user_name = #userName#
+	    </isNotNull>
+	    <isNotNull prepend="," property="nickname">
+	      nickname = #nickname#
+	    </isNotNull>
+	    <isNotNull prepend="," property="companyId">
+	      company_id = #companyId#
+	    </isNotNull>
+	    <isNotNull property="password">
+	    	<isNotEmpty prepend=","  property="password">
+		      password = #password#
+	    	</isNotEmpty>
+	    </isNotNull>
+	    <isNotNull prepend="," property="status">
+	      status = #status#
+	    </isNotNull>
+	    <isNotNull prepend="," property="description">
+	      description = #description#
+	    </isNotNull>
+	    <isNotNull prepend="," property="pyPassword">
+	      py_password = #pyPassword#
+	    </isNotNull>
+	  </dynamic>
+	  WHERE user_id = #userId#
+	</update>
+	
+	<delete id="delete_slh_user" parameterClass="UserForm">
+		delete from slh_user where user_id = #userId#
+	</delete>
+	
+	<!-- start 用户角色 -->
+	
+	<resultMap id="user_role_result" class="UserRole">
+		<result column="user_id" property="userId"/>
+		<result column="role_id" property="roleId"/>
+	</resultMap>
+	
+	<select id="select_slh_user_role" resultMap="user_role_result" parameterClass="UserRole">
+		select user_id,role_id from slh_user_role where user_id = #userId# and role_id = #roleId#
+	</select>
+	
+	<insert id="insert_slh_user_role" parameterClass="UserRole">
+		insert into slh_user_role(user_id,role_id) values(#userId#,#roleId#)
+	</insert>
+	
+	<delete id="delete_slh_user_role" parameterClass="UserRole">
+		delete from slh_user_role where user_id =#userId#
+	</delete>
+	<!-- end 用户角色 -->
+	
+	<!-- start 用户渠道 -->
+	<resultMap id="user_channel_result" class="UserChannel">
+		<result column="user_id" property="userId"/>
+		<result column="channel_id" property="channelId"/>
+	</resultMap>
+	
+	<select id="select_slh_user_channel" resultMap="user_channel_result" parameterClass="UserChannel">
+		select user_id,channel_id from slh_user_channel where user_id = #userId# and channel_id = #channelId#
+	</select>
+	
+	<insert id="insert_slh_user_channel" parameterClass="UserChannel">
+		insert into slh_user_channel(user_id,channel_id) values(#userId#,#channelId#)
+	</insert>
+	<delete id="delete_slh_user_channel" parameterClass="UserChannel">
+		delete from slh_user_channel where user_id=#userId#
+	</delete>
+	
+	<!-- end 用户渠道 -->
+	
+	<!-- start 用户市场 -->
+	
+	<resultMap id="UserMarketResult" class="UserMarket">
+		<result column="user_id" property="userId"/>
+		<result column="market_id" property="marketId"/>
+		<result column="pindao_id" property="pindaoId"/>
+	</resultMap>
+	
+	<select id="select_slh_user_market" resultMap="UserMarketResult" parameterClass="UserMarket">
+		select user_id,market_id,pindao_id from slh_user_market where user_id = #userId# and market_id = #marketId#
+	</select>
+	
+	<insert id="insert_slh_user_market" parameterClass="UserMarket">
+		insert into slh_user_market(user_id,market_id,pindao_id) values(#userId#,#marketId#,#pindaoId#)
+	</insert>
+	<delete id="delete_slh_user_market" parameterClass="UserMarket">
+		delete from slh_user_market where user_id=#userId#
+	</delete>
+	
+	<!-- end 用户市场 -->
+	
+	<!-- start 用户的权限 -->
+	<resultMap id="user_menu_result" class="MenuForm" >
+	    <result column="resource_id" property="resourceId" />
+	    <result column="resource_name" property="resourceName" />
+	    <result column="permission" property="permission" />
+	    <result column="resource_url" property="resourceUrl" />
+	    <result column="parent" property="parent" />
+	    <result column="display_sort" property="displaySort" />
+	    <result column="display_type" property="displayType" />
+	    <result column="description" property="description" />
+	</resultMap>
+	
+	<select id="select_slh_user_menu_list" resultMap="user_menu_result" parameterClass="UserForm">
+		SELECT
+			m.*
+		FROM
+			slh_user u,
+			slh_user_role ur,
+			slh_role r,
+			slh_role_resource rr,
+			slh_resource m
+		WHERE
+			u.user_id = ur.user_id
+		AND ur.role_id = r.role_id
+		AND r.role_id = rr.role_id
+		AND rr.resource_id = m.resource_id
+		AND u.user_name = #userName# 
+		GROUP BY
+			m.resource_id
+		order by display_sort	
+	</select>
+	
+	<select id="select_slh_user_market_pindao_list" resultMap="UserMarketResult" parameterClass="UserMarket">
+		select user_id, market_id, pindao_id 
+		from slh_user_market 
+		where user_id = #userId# 
+		and market_id = #marketId#
+		order by pindao_id asc
+	</select>
+	
+	<!-- start 用户的权限 -->
+	
+</sqlMap>

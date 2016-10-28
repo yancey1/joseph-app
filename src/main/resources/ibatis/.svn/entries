@@ -1,0 +1,43 @@
+8
+
+dir
+7577
+svn://192.168.1.100/project/server/trunk/slh-lock-screen-cmp/src/main/resources/ibatis
+svn://192.168.1.100/project
+
+
+
+2016-01-19T11:48:56.149099Z
+7570
+xiaomin.huang
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+59c3661d-1c1c-4b4a-bfb1-4609a1675fe2
+
+sqlmap-config.xml
+file
+7760
+
+
+
+2016-02-22T02:32:47.975520Z
+8e1f38e53fd6ee92d19972cfa0ec9acc
+2016-02-22T02:47:42.120141Z
+7760
+wei.yan
+
+mapping
+dir
+

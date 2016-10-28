@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_biz_app_mapping">
+
+	<typeAlias alias="bizAppDomain" type="com.yancey.manager.domain.BizAppDomain" />
+	
+	
+	<insert id="INSERT_ENTITY" parameterClass="bizAppDomain" >
+		INSERT INTO slh_app_topic_mapping(bid,topic_id,state, order_num)
+	 	VALUES(#id#,#topicId#,#state#, #orderNum#)
+	</insert>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_app_topic_mapping where bid = #id#
+	</delete>
+	
+</sqlMap>

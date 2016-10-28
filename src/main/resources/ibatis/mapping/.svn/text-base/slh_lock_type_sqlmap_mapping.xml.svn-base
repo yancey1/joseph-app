@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_locktype">
+
+	<typeAlias alias="lockType" type="com.yancey.manager.domain.LockTypeDomain" />
+	
+	<resultMap id="lockTypeResult" class="lockType" >
+	    <result column="id" property="id" />
+	    <result column="name" property="name" />
+	    <result column="order_num" property="orderNum" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	</resultMap>
+	
+	<sql id="slh_lockType_query-conditions" >
+	    <dynamic>
+	      <isNotEmpty prepend="and" property="name" >
+	        name like concat('%',#name#,'%') 
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="lockType">
+		SELECT COUNT(1) FROM slh_lock_type a WHERE 1 = 1 
+		<include refid="slh_lockType_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="lockTypeResult" parameterClass="lockType">
+		SELECT 
+		id,
+		name,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_lock_type
+		WHERE 1 = 1 
+		<include refid="slh_lockType_query-conditions"/>
+		ORDER BY order_num asc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="select_slh_wallPaper_list" resultMap="lockTypeResult" parameterClass="lockType">
+		SELECT 
+		id,
+		name,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_lock_type
+		WHERE 1 = 1 
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="lockTypeResult" parameterClass="lockType">
+		SELECT 
+		id,
+		name,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_lock_type
+		WHERE 1 = 1 
+		<dynamic>
+	       <isNotEmpty prepend="and" property="name" >
+	        name =#name#
+	      </isNotEmpty>
+	       <isNotEmpty prepend="or" property="orderNum" >
+	        order_num =#orderNum#
+	      </isNotEmpty>
+	    </dynamic>
+		ORDER BY modify_time DESC
+	</select>
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="lockTypeResult" parameterClass="java.lang.Integer">
+		SELECT 
+		id,
+		name,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_lock_type
+		WHERE id=#id#
+	</select>
+	
+	<insert id="INSERT_ENTITY" parameterClass="lockType" >
+		INSERT INTO slh_lock_type(name,order_num,creator,create_time, modify_time)
+	 	VALUES(#name#,#orderNum#,#creator#,NOW(), NOW())
+		<selectKey resultClass="java.lang.Integer" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<update id="UPDATE_ENTITY" parameterClass="lockType" >
+	  UPDATE slh_lock_type SET modify_time = NOW()
+	  <dynamic>
+	    <isNotEmpty prepend="," property="name">
+	      name = #name#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="orderNum">
+	      order_num = #orderNum#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE id = #id#
+	</update>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_lock_type where id = #id#
+	</delete>
+	<select id="getMaxOrderNum" resultClass="java.lang.Integer">
+		select
+		ifnull(max(order_num),0)
+		from 
+		slh_lock_type
+	</select>
+</sqlMap>

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_remain_sum">
+
+	<typeAlias alias="remainSumData" type="com.yancey.manager.domain.RemainSumData" />
+	
+	<resultMap class="remainSumData" id="sumRemainDataMap">
+		<result property="bizDate" column="biz_date"/>
+		<result property="bizAppId" column="biz_app_id"/>
+		<result property="firstVisit" column="first_visit"/>
+		<result property="newUser" column="new_user"/>
+		<result property="remain1" column="remain_1"/>
+		<result property="remain2" column="remain_2"/>
+		<result property="remain3" column="remain_3"/>
+		<result property="remain4" column="remain_4"/>
+		<result property="remain5" column="remain_5"/>
+		<result property="remain6" column="remain_6"/>
+		<result property="remain7" column="remain_7"/>
+		<result property="remain10" column="remain_10"/>
+		<result property="remain15" column="remain_15"/>
+		<result property="remain20" column="remain_20"/>
+		<result property="remain30" column="remain_30"/>
+	</resultMap>
+	
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer" parameterClass="remainSumData">
+		select 
+		count(1)
+		from slh_lock_screen_warehourse.v_slh_remain_sum_info
+		where 1=1
+		<isNotEmpty prepend="and" property="startDate">
+			biz_date &gt;= #startDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endDate">
+			biz_date &lt;= #endDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="bizAppId">
+			biz_app_id = #bizAppId#
+		</isNotEmpty>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="sumRemainDataMap" parameterClass="remainSumData">
+		select 
+				biz_date,
+				CASE 
+				WHEN biz_date =date_format(date_add(SYSDATE(), INTERVAL -1 DAY),'%Y-%m-%d')
+				then sum(remain_1)=0
+				ELSE sum(remain_1)
+				end as 'remain_1', 
+				biz_app_id, 
+				(select sum(first_visit_data) from slh_lock_screen_warehourse.slh_first_visit_data where biz_date=t.biz_date and biz_app_id=t.biz_app_id) as first_visit,
+				sum(new_user) as new_user,
+				SUM(remain_2)as remain_2,
+				SUM(remain_3)as remain_3,
+				SUM(remain_4)as remain_4,
+				SUM(remain_5)as remain_5,
+				SUM(remain_6)as remain_6,
+				SUM(remain_7)as remain_7,
+				SUM(remain_10)as remain_10,
+				SUM(remain_15)as remain_15,
+				SUM(remain_20)as remain_20,
+				SUM(remain_30)as remain_30 
+			from  slh_lock_screen_warehourse.slh_remain_info t
+		where 1=1 
+		<isNotEmpty prepend="and" property="startDate">
+			biz_date &gt;= #startDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endDate">
+			biz_date &lt;= #endDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="bizAppId">
+			biz_app_id = #bizAppId#
+		</isNotEmpty>
+		GROUP BY biz_date,biz_app_id
+order by biz_date desc
+	</select>
+	
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="sumRemainDataMap" parameterClass="remainSumData">
+		select 
+				biz_date,
+				CASE 
+				WHEN biz_date =date_format(date_add(SYSDATE(), INTERVAL -1 DAY),'%Y-%m-%d')
+				then sum(remain_1)=0
+				ELSE sum(remain_1)
+				end as 'remain_1', 
+				biz_app_id, 
+				(select sum(first_visit_data) from slh_lock_screen_warehourse.slh_first_visit_data where biz_date=t.biz_date and biz_app_id=t.biz_app_id) as first_visit,
+				sum(new_user) as new_user,
+				SUM(remain_2)as remain_2,
+				SUM(remain_3)as remain_3,
+				SUM(remain_4)as remain_4,
+				SUM(remain_5)as remain_5,
+				SUM(remain_6)as remain_6,
+				SUM(remain_7)as remain_7,
+				SUM(remain_10)as remain_10,
+				SUM(remain_15)as remain_15,
+				SUM(remain_20)as remain_20,
+				SUM(remain_30)as remain_30 
+			from  slh_lock_screen_warehourse.slh_remain_info t
+		where 1=1 
+		<isNotEmpty prepend="and" property="startDate">
+			biz_date &gt;= #startDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endDate">
+			biz_date &lt;= #endDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="bizAppId">
+			biz_app_id = #bizAppId#
+		</isNotEmpty>
+		GROUP BY biz_date,biz_app_id
+order by biz_date desc
+	</select>
+	
+	
+	
+	<select id="select_slh_remainsum_list" resultMap="sumRemainDataMap" parameterClass="remainSumData">
+		
+			select 
+				biz_date,
+				CASE 
+				WHEN biz_date =date_format(date_add(SYSDATE(), INTERVAL -1 DAY),'%Y-%m-%d')
+				then sum(remain_1)=0
+				ELSE sum(remain_1)
+				end as 'remain_1', 
+				biz_app_id, 
+				(select sum(first_visit_data) from slh_lock_screen_warehourse.slh_first_visit_data where biz_date=t.biz_date and biz_app_id=t.biz_app_id) as first_visit,
+				sum(new_user) as new_user,
+				SUM(remain_2)as remain_2,
+				SUM(remain_3)as remain_3,
+				SUM(remain_4)as remain_4,
+				SUM(remain_5)as remain_5,
+				SUM(remain_6)as remain_6,
+				SUM(remain_7)as remain_7,
+				SUM(remain_10)as remain_10,
+				SUM(remain_15)as remain_15,
+				SUM(remain_20)as remain_20,
+				SUM(remain_30)as remain_30 
+			from  slh_lock_screen_warehourse.slh_remain_info t
+		where 1=1 
+		<isNotEmpty prepend="and" property="startDate">
+			biz_date &gt;= #startDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endDate">
+			biz_date &lt;= #endDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="bizAppId">
+			biz_app_id = #bizAppId#
+		</isNotEmpty>
+		GROUP BY biz_date,biz_app_id
+order by biz_date desc
+	</select>
+</sqlMap>

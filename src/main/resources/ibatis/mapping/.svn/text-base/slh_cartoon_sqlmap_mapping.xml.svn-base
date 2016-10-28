@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_cartoon">
+
+	<typeAlias alias="cartoon" type="com.yancey.manager.domain.CartoonDomain" />
+	
+	<resultMap id="cartoonResult" class="joke" >
+	    <result column="id" property="id" />
+	    <result column="title" property="title" />
+	    <result column="image_id" property="imageId" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	    <result column="publish_time" property="publishTime" />
+	     <result column="display_mech" property="displayMech" />
+	    <result column="appoint_start_time" property="appointStartDate" />
+	    <result column="appoint_end_time" property="appointEndDate" />
+	    <result column="fixed_start_time" property="fixedStartTime" />
+	    <result column="fixed_end_time" property="fixedEndTime" />
+	    <result column="order_num" property="orderNum"/>
+	    <result column="link_url" property="linkUrl" />
+	     <result column="link_title" property="linkTitle" />
+	    <result column="html_content" property="htmlContent" />
+	    <result column="image_id" property="image" select="slh_image.selectImageByRefId" />
+	</resultMap>
+	
+	<sql id="slh_cartoon_info_query-conditions" >
+	    <dynamic>
+	      <isNotEmpty prepend="and" property="title" >
+	        title like concat('%',#title#,'%') 
+	      </isNotEmpty>
+	      <isNotEmpty prepend="and" property="publishTimeStart">
+	      	publish_time &gt;= #publishTimeStart#
+	      </isNotEmpty>
+	      <isNotEmpty prepend="and" property="publishTimeEnd">
+	      	publish_time &lt;= #publishTimeEnd#
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="cartoon">
+		SELECT COUNT(1) FROM slh_cartoon_info a WHERE 1 = 1 
+		<include refid="slh_cartoon_info_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="cartoonResult" parameterClass="cartoon">
+		SELECT 
+		id,
+		title,
+		link_title,
+		link_url,
+		html_content,
+		image_id,
+		publish_time,
+		display_mech,
+		appoint_start_time,
+		appoint_end_time,
+		fixed_start_time,
+		fixed_end_time,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_cartoon_info
+		WHERE 1 = 1 
+		<include refid="slh_cartoon_info_query-conditions"/>
+		ORDER BY publish_time desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="cartoonResult" parameterClass="cartoon">
+		SELECT 
+		id,
+		title,
+		link_title,
+		link_url,
+		html_content,
+		image_id,
+		publish_time,
+		display_mech,
+		appoint_start_time,
+		appoint_end_time,
+		fixed_start_time,
+		fixed_end_time,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_cartoon_info
+		WHERE 1 = 1 
+		
+		<dynamic>
+	      
+	      <isNotEmpty prepend="and" property="publishTimeStart">
+	    			<![CDATA[
+	    				publish_time >= #publishTimeStart#
+	    			]]>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="publishTimeEnd">
+	    			<![CDATA[
+	    				publish_time <= #publishTimeEnd#
+	    			]]>
+	    	</isNotEmpty>
+	      
+	    </dynamic>
+		ORDER BY publish_time DESC
+		<isNotEmpty property="pageStatus">
+				LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+		</isNotEmpty>
+	</select>
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="cartoonResult" parameterClass="java.lang.Integer">
+		SELECT 
+		id,
+		title,
+		link_title,
+		link_url,
+		html_content,
+		image_id,
+		publish_time,
+		display_mech,
+		appoint_start_time,
+		appoint_end_time,
+		fixed_start_time,
+		fixed_end_time,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_cartoon_info
+		WHERE id=#id#
+	</select>
+	
+	
+	
+	<insert id="INSERT_ENTITY" parameterClass="cartoon" >
+		INSERT INTO slh_cartoon_info(link_title,link_url,title,image_id,publish_time,display_mech,appoint_start_time,appoint_end_time,
+		fixed_start_time,fixed_end_time,order_num,creator,create_time, modify_time)
+	 	VALUES(#linkTitle#,#linkUrl#,#title#,#imageId#,#publishTime#,#displayMech#,#appointStartDate#,#appointEndDate#,
+	 	#fixedStartTime#,#fixedEndTime#,#orderNum#,#creator#,NOW(), NOW())
+		<selectKey resultClass="java.lang.Integer" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<update id="UPDATE_ENTITY" parameterClass="cartoon" >
+	  UPDATE slh_cartoon_info SET modify_time = NOW()
+	  <dynamic>
+	    <isNotEmpty prepend="," property="title">
+	      title = #title#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="imageId">
+	      image_id = #imageId#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="publishTime">
+	      publish_time = #publishTime#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="displayMech">
+	      display_mech = #displayMech#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="appointStartDate">
+	      appoint_start_time = #appointStartDate#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="appointEndDate">
+	      appoint_end_time = #appointEndDate#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="fixedStartTime">
+	      fixed_start_time = #fixedStartTime#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="fixedEndTime">
+	      fixed_end_time = #fixedEndTime#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="orderNum">
+	      order_num = #orderNum#
+	    </isNotEmpty>
+	    <isNotNull prepend="," property="linkTitle">
+	      link_title = #linkTitle#
+	    </isNotNull>
+	     <isNotNull prepend="," property="linkUrl">
+	      link_url = #linkUrl#
+	    </isNotNull>
+	    <isNotEmpty prepend="," property="htmlContent">
+	      html_content = #htmlContent#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE id = #id#
+	</update>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_cartoon_info where id = #id#
+	</delete>
+	<select id="selectByCid" resultMap="cartoonResult" parameterClass="java.lang.Integer">
+		SELECT 
+		id,
+		title,
+		link_title,
+		link_url,
+		html_content,
+		publish_time,
+		display_mech,
+		appoint_start_time,
+		appoint_end_time,
+		fixed_start_time,
+		fixed_end_time,
+		image_id,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_cartoon_info
+		WHERE id=#value#
+	</select>
+	
+	<select id="getMaxOrderNum" resultClass="java.lang.Integer">
+		select
+		ifnull(max(order_num),0)
+		from 
+		slh_cartoon_info
+	</select>
+	
+	<update id="modifyOrderNumBySave" parameterClass="java.util.Map">
+		update slh_cartoon_info set order_num=order_num+1
+		where 
+		order_num &gt;=#oldOrder#
+	</update>
+	
+	<update id="modifyMaxOrderNum" parameterClass="java.util.Map">
+		update slh_cartoon_info set order_num=order_num-1
+		where 
+		order_num &gt;#oldOrder#
+		and
+		order_num &lt;=#newOrder#
+	</update>
+	
+	<update id="modifyMinOrderNum" parameterClass="java.util.Map">
+		update slh_cartoon_info set order_num=order_num+1
+		where 
+		order_num &lt;#oldOrder#
+		and
+		order_num &gt;=#newOrder#
+	</update>
+	
+	<update id="modifyOrderNumByDelete" parameterClass="java.util.Map">
+		update slh_cartoon_info set order_num=order_num-1
+		where
+		order_num &gt;#num#
+	</update>
+</sqlMap>

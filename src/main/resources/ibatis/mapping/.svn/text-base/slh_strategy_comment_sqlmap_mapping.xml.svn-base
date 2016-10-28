@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_strategy_comment">
+
+	<typeAlias alias="strategyCommentDomain" type="com.yancey.manager.domain.StrategyCommentDomain" />
+	
+	<resultMap id="strategyCommentResult" class="strategyCommentDomain" >
+	    <result column="id" property="id" />
+	    <result column="strategy_id" property="strategyId" />
+	    <result column="com_user_name" property="comUserName" />
+	    <result column="com_nickname" property="comNickname" />
+	    <result column="reply_user_name" property="replyUserName" />
+	    <result column="reply_nickname" property="replyNickname" />
+	    <result column="comment_time" property="commentTime" />
+	    <result column="comment_desc" property="commentDesc" />
+	    <result column="image_id" property="imageId" />
+	    <result column="parent_id" property="parentId" />
+	    <result column="comment_type" property="commentType" />
+	    <result column="is_top" property="isTop" />
+	    <result column="is_hide" property="isHide" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	    <result column="image_id" property="image" select="slh_image.selectImageByRefId" />
+	</resultMap>
+	
+	<sql id="slh_strategy_comment_query-conditions" >
+	    <dynamic>
+	      <isNotEmpty prepend="and" property="publishTimeStart">
+	      	comment_time &gt;= #publishTimeStart#
+	      </isNotEmpty>
+	      <isNotEmpty prepend="and" property="publishTimeEnd">
+	      	comment_time &lt;= #publishTimeEnd#
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="strategyCommentDomain">
+		SELECT COUNT(1) FROM slh_strategy_comment a where is_hide=1 
+		<include refid="slh_strategy_comment_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="strategyCommentResult" parameterClass="strategyCommentDomain">
+			      	    SELECT
+							id,
+							strategy_id,
+							com_user_name,
+							com_nickname,
+							reply_user_name,
+							reply_nickname,
+							is_top,
+							is_hide,
+							comment_time,
+							comment_desc,
+							image_id,
+							parent_id,
+							comment_type,						
+							create_time,
+							modify_time
+						FROM
+						slh_strategy_comment
+						where 
+						 is_hide=1 and
+						1=1
+						<include refid="slh_strategy_comment_query-conditions"/>
+						order by is_top desc, comment_time desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<update id="UPDATE_ENTITY" parameterClass="strategyCommentDomain" >
+	  UPDATE slh_strategy_comment SET modify_time = NOW()
+	  <dynamic>
+	    <isNotEmpty prepend="," property="isTop">
+	      is_top = #isTop#
+	    </isNotEmpty>
+	      <isNotEmpty prepend="," property="isHide">
+	      is_hide = #isHide#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE id = #id#
+	</update>
+	
+</sqlMap>

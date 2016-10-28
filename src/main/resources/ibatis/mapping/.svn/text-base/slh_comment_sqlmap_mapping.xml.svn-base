@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_comment">
+
+	<typeAlias alias="commentDomain" type="com.yancey.manager.domain.CommentDomain" />
+	
+	<resultMap id="commentResult" class="commentDomain" >
+	    <result column="id" property="id" />
+	    <result column="type" property="type" />
+	    <result column="ref_id" property="refId" />
+	    <result column="user_name" property="userName" />
+	    <result column="nick_name" property="nickName" />
+	    <result column="score" property="score" />
+	    <result column="comment_time" property="commentTime" />
+	    <result column="comment_desc" property="commentDesc" />
+	    <result column="is_top" property="isTop" />
+	    <result column="is_hide" property="isHide" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	    <result column="ref_name" property="refName"/>
+	</resultMap>
+	
+	<sql id="slh_comment_info_query-conditions" >
+	    <dynamic>
+	      <isNotEmpty prepend="and" property="type" >
+	        type =#type# 
+	      </isNotEmpty>
+	      <isNotEmpty property="refName" >
+	      	<isEqual property="type"  compareValue="1" prepend="and">
+	      		ref_id in(select id from slh_page_game_info where name like concat('%',#refName#,'%'))
+	      	</isEqual>
+	      	
+	      	<isEqual property="type"  compareValue="2" prepend="and">
+	      		ref_id in(select apk_id from slh_apk where apk_name like concat('%',#refName#,'%'))
+	      	</isEqual>
+	      </isNotEmpty>
+	      <isNotEmpty prepend="and" property="publishTimeStart">
+	      	comment_time &gt;= #publishTimeStart#
+	      </isNotEmpty>
+	      <isNotEmpty prepend="and" property="publishTimeEnd">
+	      	comment_time &lt;= #publishTimeEnd#
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="commentDomain">
+		SELECT COUNT(1) FROM slh_ref_comment_mapping a where is_hide=1 and is_init=1
+		<include refid="slh_comment_info_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="commentResult" parameterClass="commentDomain">
+			      	    SELECT
+						id,
+						type,
+						ref_id,
+						case 
+						when type=1 then (select name from slh_page_game_info where id=ref_id)
+					    when type=2 then (select apk_name from slh_apk where apk_id=ref_id)
+						end as ref_name,
+						user_name,
+						nick_name,
+						score,
+						is_top,
+						is_hide,
+						comment_time,
+						comment_desc,
+						create_time,
+						modify_time
+						FROM
+						slh_ref_comment_mapping
+						where 
+						is_hide=1
+						and
+						is_init=1
+						<include refid="slh_comment_info_query-conditions"/>
+						order by is_top desc, comment_time desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<update id="UPDATE_ENTITY" parameterClass="commentDomain" >
+	  UPDATE slh_ref_comment_mapping SET modify_time = NOW()
+	  <dynamic>
+	    <isNotEmpty prepend="," property="isTop">
+	      is_top = #isTop#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="isHide">
+	      is_hide = #isHide#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE id = #id#
+	</update>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_ref_advert where id = #id#
+	</delete>
+</sqlMap>

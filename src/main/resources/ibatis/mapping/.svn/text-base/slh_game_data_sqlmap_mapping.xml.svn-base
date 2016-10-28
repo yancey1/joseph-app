@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_game_data">
+
+	<typeAlias alias="gameDataDomain" type="com.yancey.manager.domain.GameDataDomain" />
+	
+	<resultMap id="gameDataDomainResult" class="gameDataDomain" >
+	    <result column="game_id" property="gameId" />
+	    <result column="game_name" property="gameName" />
+	    <result column="init_delta_num" property="initDeltaNum" />
+	    <result column="real_player_num" property="realPlayerNum" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	</resultMap>
+	
+	<sql id="slh_game_data_query-conditions" >
+	    <dynamic>
+	      	<isNotEmpty prepend="and" property="gameId">
+				game_id =#gameId#
+			</isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="gameDataDomain">
+		SELECT COUNT(1) FROM slh_game_data_info a WHERE 1 = 1 
+		<include refid="slh_game_data_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="gameDataDomainResult" parameterClass="gameDataDomain">
+		SELECT 
+			game_id,
+			game_name,
+			init_delta_num,
+			real_player_num,
+			create_time,
+			modify_time
+		FROM slh_game_data_info
+		WHERE 1 = 1 
+		<include refid="slh_game_data_query-conditions"/>
+		ORDER BY modify_time asc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="gameDataDomainResult" parameterClass="gameDataDomain">
+		SELECT 
+			game_id,
+			game_name,
+			init_delta_num,
+			real_player_num,
+			create_time,
+			modify_time
+		FROM slh_game_data_info
+		WHERE 1 = 1 
+		<dynamic>
+			<isNotEmpty prepend="and" property="gameId">
+				game_id =#gameId#
+			</isNotEmpty>
+	    </dynamic>
+	    ORDER BY modify_time DESC
+	</select>
+	
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="gameDataDomainResult" parameterClass="java.lang.Integer">
+		SELECT 
+			game_id,
+			game_name,
+			init_delta_num,
+			real_player_num,
+			create_time,
+			modify_time
+		FROM slh_game_data_info
+		WHERE game_id=#gameId#
+	</select>
+	
+	
+	<update id="UPDATE_ENTITY" parameterClass="gameDataDomain" >
+	  UPDATE slh_game_data_info SET modify_time = NOW()
+	  <dynamic>
+	    <isNotEmpty prepend="," property="initDeltaNum">
+	      init_delta_num = #initDeltaNum#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE game_id=#gameId#
+	</update>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_game_data_info where game_id=#gameId#
+	</delete>
+	
+</sqlMap>

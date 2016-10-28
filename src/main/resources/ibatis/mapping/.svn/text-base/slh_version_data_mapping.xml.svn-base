@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_version_data">
+
+	<typeAlias alias="versionData" type="com.yancey.manager.domain.VersionData" />
+	
+	<resultMap class="versionData" id="versionDataMap">
+		<result property="bizDate" column="biz_date"/>
+		<result property="channelId" column="channel_id"/>
+		<result property="apkVerName" column="apk_ver_name"/>
+		<result property="newUser" column="new_user"/>
+		<result property="createTime" column="create_time"/>
+	</resultMap>
+	
+	<sql id="version_data_query_conditions" >
+	     <dynamic>
+	    	<isNotEmpty prepend="and" property="startDate">
+	    			<![CDATA[
+	    				biz_date >= #startDate#
+	    			]]>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="endDate">
+	    			<![CDATA[
+	    				biz_date <= #endDate#
+	    			]]>
+	    	</isNotEmpty>
+	     	<isNotEmpty property="channelId" prepend="and">
+		     		channel_id =#channelId# 
+	     	</isNotEmpty>
+	    </dynamic>
+	</sql>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="versionDataMap" parameterClass="versionData">
+		select 
+			biz_date,
+			channel_id,
+			apk_ver_name,
+			new_user,
+			create_time
+		from slh_lock_screen_warehourse.slh_version_data
+		where 1=1
+		<include refid="version_data_query_conditions"/>
+		order by biz_date desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="versionDataMap" parameterClass="versionData">
+		select 
+			biz_date,
+			channel_id,
+			apk_ver_name,
+			new_user,
+			create_time
+			from slh_lock_screen_warehourse.slh_version_data
+		where 1=1
+		<isNotEmpty prepend="and" property="startDate">
+			biz_date &gt;= #startDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endDate">
+			biz_date &lt;= #endDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="channelId">
+			channel_id = #channelId#
+		</isNotEmpty>
+		order by create_time desc
+	</select>
+	
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer" parameterClass="versionData">
+		select 
+		count(1)
+		from slh_lock_screen_warehourse.slh_version_data
+		where 1=1
+		<include refid="version_data_query_conditions"/>
+	</select>
+	
+	
+	
+	<select id="select_slh_versionData_list" resultMap="versionDataMap" parameterClass="versionData">
+		select 
+			biz_date,
+			channel_id,
+			apk_ver_name,
+			new_user,
+			create_time
+			from slh_lock_screen_warehourse.slh_version_data
+		where 1=1
+		<include refid="version_data_query_conditions"/>
+		order by biz_date desc
+	</select>
+</sqlMap>

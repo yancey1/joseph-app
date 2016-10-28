@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_biz_app">
+
+	<typeAlias alias="bizAppDomain" type="com.yancey.manager.domain.BizAppDomain" />
+	<typeAlias alias="topicDomain" type="com.yancey.manager.domain.TopicinfoDomain" />
+	
+	<resultMap id="appResultMap" class="bizAppDomain" >
+	    <result column="id" property="id" />
+	    <result column="biz_app_id" property="bizAppId" />
+	    <result column="channel_id" property="channelId" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	    <result column="id" property="topicList" select="slh_biz_app.getTopicList" />
+	</resultMap>
+	
+	<resultMap id="topicResultMap" class="topicDomain">
+		<result column="id" property="id" />
+	    <result column="topic_id" property="topicId" />
+	    <result column="topic_name" property="topicName" />
+	    <result column="state" property="state" />
+	</resultMap>
+	
+	<sql id="slh_biz_app_info_query-conditions" >
+	    <dynamic>
+	      <isNotEmpty prepend="and" property="bizAppId" >
+	        biz_app_id like concat('%',#bizAppId#,'%') 
+	      </isNotEmpty>
+	      <isNotEmpty prepend="and" property="channelId" >
+	        channel_id like concat('%',#channelId#,'%') 
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="bizAppDomain">
+		SELECT COUNT(1) FROM slh_biz_app_manage a WHERE 1 = 1 
+		<include refid="slh_biz_app_info_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="appResultMap" parameterClass="bizAppDomain">
+		SELECT 
+		id,
+		biz_app_id,
+		channel_id,
+		create_time,
+		modify_time
+		FROM slh_biz_app_manage
+		WHERE 1 = 1 
+		<include refid="slh_biz_app_info_query-conditions"/>
+		ORDER BY modify_time desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultClass="bizAppDomain" parameterClass="bizAppDomain">
+		SELECT 
+		distinct(biz_app_id) as bizAppId
+		FROM slh_biz_app_manage
+		where 1=1
+		<include refid="slh_biz_app_info_query-conditions"/>
+	</select>
+	
+	<select id="GET_DELEPLOY_ENTITY_LIST" resultClass="bizAppDomain" parameterClass="bizAppDomain">
+		SELECT 
+		id,
+		biz_app_id,
+		channel_id,
+		create_time,
+		modify_time
+		FROM slh_biz_app_manage
+		WHERE 1 = 1 
+		<dynamic>
+			<isNotEmpty prepend="and" property="bizAppId">
+				biz_app_id=#bizAppId#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="channelId">
+				channel_id=#channelId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="appResultMap" parameterClass="java.lang.Integer">
+		SELECT 
+		id,
+		biz_app_id,
+		channel_id,
+		create_time,
+		modify_time
+		FROM slh_biz_app_manage
+		WHERE id=#id#
+	</select>
+	
+	<insert id="insertBizAppDomain" parameterClass="bizAppDomain" >
+		INSERT INTO slh_biz_app_manage(biz_app_id,channel_id,create_time, modify_time)
+	 	VALUES(#bizAppId#,#channelId#,NOW(), NOW())
+		<selectKey resultClass="java.lang.Integer" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<update id="UPDATE_ENTITY" parameterClass="bizAppDomain" >
+	  UPDATE slh_biz_app_manage SET modify_time = NOW()
+	  <dynamic>
+	    <isNotEmpty prepend="," property="bizAppId">
+	      biz_app_id = #bizAppId#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="channelId">
+	      channel_id = #channelId#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE id = #id#
+	</update>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_biz_app_manage where id = #id#
+	</delete>
+	
+	<select id="getTopicList" parameterClass="java.lang.Integer" resultMap="topicResultMap">
+		select 
+		i.id,
+		i.topic_id,
+		i.topic_name,
+		t.state
+		from 
+		slh_biz_app_manage b,
+		slh_app_topic_mapping t,
+		slh_topic_info i
+		where
+		b.id=t.bid
+		and
+		t.topic_id=i.topic_id
+		and t.bid=#id#
+		order by t.order_num
+	</select>
+</sqlMap>

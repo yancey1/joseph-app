@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_topic">
+
+	<typeAlias alias="topicInfo" type="com.yancey.manager.domain.TopicDomain" />
+	
+	<resultMap id="topicResult" class="topicInfo" >
+	    <result column="id" property="id" />
+	    <result column="value" property="val" />
+	    <result column="name" property="name" />
+	    <result column="channel_id" property="channelId" />
+	    <result column="biz_app_id" property="bizAppId" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	    <result column="order_num" property="orderNum" />
+	</resultMap>
+	
+	<sql id="slh_topic_info_query-conditions" >
+	    <dynamic>
+	      <isNotEmpty prepend="and" property="val" >
+	        value =#val#
+	      </isNotEmpty>
+	      <isNotEmpty prepend="and" property="channelId">
+	        channel_id like concat('%',#channelId#,'%') 
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="topicInfo">
+		SELECT COUNT(1) FROM slh_topic a WHERE 1 = 1 
+		<include refid="slh_topic_info_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="topicResult" parameterClass="topicInfo">
+		SELECT 
+		id,
+		value,
+		biz_app_id,
+		channel_id,
+		name,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_topic
+		WHERE 1 = 1 
+		<include refid="slh_topic_info_query-conditions"/>
+		ORDER BY order_num
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="topicResult" parameterClass="topicInfo">
+		SELECT 
+		id,
+		value,
+		biz_app_id,
+		channel_id,
+		name,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_topic
+		WHERE 1 = 1 
+		<dynamic>
+			<isNotEmpty prepend="and" property="id">
+				id &lt;&gt; #id#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="state">
+				id = #state#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="val">
+				value=#val#
+			</isNotEmpty>
+			<isNotEmpty  prepend="and" property="channelId">
+				channel_id=#channelId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="topicResult" parameterClass="java.lang.Integer">
+		SELECT 
+		id,
+		value,
+		biz_app_id,
+		channel_id,
+		name,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_topic
+		WHERE id=#id#
+	</select>
+	
+	<insert id="INSERT_ENTITY" parameterClass="topicInfo" >
+		INSERT INTO slh_topic(value,name,biz_app_id,channel_id,order_num,creator,create_time, modify_time)
+	 	VALUES(#val#,#name#,#bizAppId#,#channelId#,#orderNum#,#creator#,NOW(), NOW())
+	</insert>
+	
+	<update id="UPDATE_ENTITY" parameterClass="topicInfo" >
+	  UPDATE slh_topic SET modify_time = NOW()
+	  <dynamic>
+	  	<isNotEmpty prepend="," property="val">
+	      value = #val#
+	    </isNotEmpty>
+	  	<isNotEmpty prepend="," property="name">
+	      name = #name#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="bizAppId">
+	      biz_app_id = #bizAppId#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="channelId">
+	      channel_id = #channelId#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="orderNum">
+	      order_num = #orderNum#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE id = #id#
+	</update>
+	
+	<delete id="deleteObjByMap" parameterClass="java.util.Map">
+		delete from slh_topic where id = #id#
+	</delete>
+	
+	<select id="getMaxOrderNum" resultClass="java.lang.Integer">
+		select
+		ifnull(max(order_num),0)
+		from 
+		slh_topic
+		where channel_id=#channelId#
+	</select>
+	
+	<update id="modifyOrderNumBySave" parameterClass="java.util.Map">
+		update slh_topic set order_num=order_num+1
+		where 
+		order_num &gt;=#oldOrder#
+		and
+	    channel_id=#channelId#
+	</update>
+	
+	<update id="modifyMaxOrderNum" parameterClass="java.util.Map">
+		update slh_topic set order_num=order_num-1
+		where 
+		order_num &gt;#oldOrder#
+		and
+		order_num &lt;=#newOrder#
+		and
+	    channel_id=#channelId#
+	</update>
+	
+	<update id="modifyMinOrderNum" parameterClass="java.util.Map">
+		update slh_topic set order_num=order_num+1
+		where 
+		order_num &lt;#oldOrder#
+		and
+		order_num &gt;=#newOrder#
+		and
+	    channel_id=#channelId#
+	</update>
+	
+	<update id="modifyOrderNumByDelete" parameterClass="java.util.Map">
+		update slh_topic set order_num=order_num-1
+		where
+		order_num &gt;#num#
+		and
+	    channel_id=#channelId#
+	</update>
+</sqlMap>

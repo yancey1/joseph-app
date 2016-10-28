@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_prize">
+
+	<typeAlias alias="prizeDomain" type="com.yancey.manager.domain.PrizeDomain" />
+	
+	<resultMap id="prizeMap" class="prizeDomain" >
+	    <result column="id" property="id" />
+	    <result column="name" property="name" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	    <result column="prize_type" property="prizeType" />
+	    <result column="prize_num" property="prizeNum" />
+	    <result column="prize_ratio" property="prizeRatio" />
+	    <result column="win_prize_num" property="winPrizeNum" />
+	     <result column="small_image_id" property="imageSmall" select="slh_image.selectImageByRefId" />
+	     <result column="big_image_id" property="imageBig" select="slh_image.selectImageByRefId" />
+	</resultMap>
+	
+	<sql id="slh_prize_query-conditions" >
+	    <dynamic>
+	      <isNotEmpty prepend="and" property="name" >
+	        name like concat('%',#name#,'%') 
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="prizeDomain">
+		SELECT COUNT(1) FROM slh_prize_info a WHERE 1 = 1 
+		<include refid="slh_prize_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="prizeMap" parameterClass="prizeDomain">
+		SELECT 
+			id,
+			`name`,
+			prize_type,
+			prize_num,
+			small_image_id,
+			big_image_id,
+			prize_ratio,
+			win_prize_num,
+			create_time,
+			modify_time
+		FROM slh_prize_info t
+		WHERE 1 = 1 
+		<include refid="slh_prize_query-conditions"/>
+		ORDER BY modify_time desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="select_slh_prize_page_list" resultMap="prizeMap" parameterClass="prizeDomain">
+		SELECT 
+			id,
+			`name`,
+			prize_type,
+			prize_num,
+			small_image_id,
+			big_image_id,
+			prize_ratio,
+			win_prize_num,
+			create_time,
+			modify_time
+		FROM slh_prize_info t
+		WHERE 1 = 1 
+		<dynamic>
+			<isNotEmpty prepend="and" property="name">
+				name like concat('%',#name#,'%') 
+			</isNotEmpty>
+		</dynamic>
+		ORDER BY modify_time desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="prizeMap" parameterClass="prizeDomain">
+		SELECT 
+			id,
+			`name`,
+			prize_type,
+			prize_num,
+			small_image_id,
+			big_image_id,
+			prize_ratio,
+			win_prize_num,
+			create_time,
+			modify_time
+		FROM slh_prize_info t
+		WHERE 1 = 1 
+		<dynamic>
+			<isNotEmpty prepend="and" property="name">
+				name like concat('%',#name#,'%') 
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="prizeMap" parameterClass="java.lang.Integer">
+		SELECT 
+			id,
+			`name`,
+			prize_type,
+			prize_num,
+			small_image_id,
+			big_image_id,
+			prize_ratio,
+			win_prize_num,
+			create_time,
+			modify_time
+		FROM slh_prize_info t
+		WHERE 1 = 1 
+		and id=#id#
+	</select>
+	
+	<insert id="INSERT_ENTITY" parameterClass="prizeDomain" >
+		INSERT INTO slh_prize_info(name,prize_type,
+			prize_num,small_image_id,big_image_id,prize_ratio,win_prize_num,create_time, modify_time)
+	 	VALUES(#name#,#prizeType#,#prizeNum#,#smallImageId#,#bigImageId#,#prizeRatio#,#winPrizeNum,#,NOW(), NOW())
+		<selectKey resultClass="java.lang.Integer" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<update id="UPDATE_ENTITY" parameterClass="prizeDomain" >
+	  UPDATE slh_prize_info SET modify_time = NOW()
+	  <dynamic>
+	    <isNotEmpty prepend="," property="name">
+	      name = #name#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="prizeType">
+	      prize_type = #prizeType#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="prizeNum">
+	      prize_num = #prizeNum#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="smallImageId">
+	      small_image_id = #smallImageId#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="bigImageId">
+	      big_image_id = #bigImageId#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="prizeRatio">
+	      prize_ratio = #prizeRatio#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="winPrizeNum">
+	      win_prize_num = #winPrizeNum#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE id = #id#
+	</update>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_prize_info where id = #id#
+	</delete>
+	
+	<select id="select_slh_prize_list" resultMap="prizeMap" parameterClass="prizeDomain">
+		SELECT 
+			id,
+			`name`,
+			prize_type,
+			prize_num,
+			small_image_id,
+			big_image_id,
+			prize_ratio,
+			win_prize_num,
+			create_time,
+			modify_time
+		FROM slh_prize_info t
+		WHERE 1 = 1 
+		
+		ORDER BY modify_time desc
+	</select>
+
+</sqlMap>

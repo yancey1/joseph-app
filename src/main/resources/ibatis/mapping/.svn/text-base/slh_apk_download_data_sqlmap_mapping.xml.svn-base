@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_apk_down_load_data">
+
+	<typeAlias alias="apkDownLoadDataDomain" type="com.yancey.manager.domain.ApkDownLoadDataDomain" />
+	
+	<resultMap id="apkDownLoadDataResult" class="apkDownLoadDataDomain" >
+	    <result column="apk_id" property="apkId" />
+	    <result column="apk_name" property="apkName" />
+	    <result column="init_delta_num" property="initDeltaNum" />
+	    <result column="real_player_num" property="realPlayerNum" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	</resultMap>
+	
+	<sql id="slh_apk_data_query-conditions" >
+	    <dynamic>
+	      	<isNotEmpty prepend="and" property="apkId">
+				apk_id =#apkId#
+			</isNotEmpty>
+	      	<isNotEmpty prepend="and" property="apkName">
+				apk_name =#apkName#
+			</isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="apkDownLoadDataDomain">
+		SELECT COUNT(1) FROM slh_apk_game_data_info a WHERE 1 = 1 
+		<include refid="slh_apk_data_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="apkDownLoadDataResult" parameterClass="apkDownLoadDataDomain">
+		SELECT 
+			apk_id,
+			apk_name,
+			init_delta_num,
+			real_player_num,
+			create_time,
+			modify_time
+		FROM slh_apk_game_data_info
+		WHERE 1 = 1 
+		<include refid="slh_apk_data_query-conditions"/>
+		ORDER BY modify_time desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	
+</sqlMap>

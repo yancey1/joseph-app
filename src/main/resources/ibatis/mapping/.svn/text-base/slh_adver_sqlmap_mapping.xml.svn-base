@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_adver">
+
+	<typeAlias alias="adver" type="com.yancey.manager.domain.AdverDomain" />
+	
+	<resultMap id="adverResult" class="adver" >
+	    <result column="id" property="id" />
+	    <result column="name" property="name" />
+	    <result column="link_url" property="linkUrl" />
+	    <result column="ref_id" property="gameId" />
+	    <result column="image_id" property="imageId" />
+	    <result column="type" property="type" />
+	    <result column="order_num" property="orderNum" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	    <result column="image_id" property="image" select="slh_image.selectImageByRefId" />
+	    <result column="ref_id" property="apk" select="slh_apk.select_slh_apk_for_assembly" />
+	    
+	</resultMap>
+	
+	<sql id="slh_adver_info_query-conditions" >
+	    <dynamic>
+	      <isNotEmpty prepend="and" property="name" >
+	        name like concat('%',#name#,'%') 
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="adver">
+		SELECT COUNT(1) FROM slh_ref_advert a WHERE 1 = 1 
+		<include refid="slh_adver_info_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="adverResult" parameterClass="adver">
+		SELECT 
+		id,
+		name,
+		link_url,
+		type,
+		image_id,
+		ref_id,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_ref_advert
+		WHERE 1 = 1 
+		<include refid="slh_adver_info_query-conditions"/>
+		ORDER BY order_num
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="adverResult" parameterClass="adver">
+		SELECT 
+		id,
+		name,
+		link_url,
+		type,
+		image_id,
+		ref_id,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_ref_advert
+		WHERE 1 = 1 
+		ORDER BY modify_time DESC
+		<isNotEmpty property="pageStatus">
+				LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+		</isNotEmpty>
+	</select>
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="adverResult" parameterClass="java.lang.Integer">
+		SELECT 
+		id,
+		name,
+		link_url,
+		type,
+		image_id,
+		ref_id,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_ref_advert
+		WHERE id=#id#
+	</select>
+	
+	<insert id="INSERT_ENTITY" parameterClass="adver" >
+		INSERT INTO slh_ref_advert(name,link_url,image_id,ref_id,type,order_num,create_time, modify_time)
+	 	VALUES(#name#,#linkUrl#,#imageId#,#gameId#,#type#,#orderNum#,NOW(), NOW())
+		<selectKey resultClass="java.lang.Integer" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<update id="UPDATE_ENTITY" parameterClass="adver" >
+	  UPDATE slh_ref_advert SET modify_time = NOW()
+	  <dynamic>
+	    <isNotEmpty prepend="," property="name">
+	      name = #name#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="type">
+	      type = #type#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="imageId">
+	      image_id = #imageId#
+	    </isNotEmpty>
+	      ,ref_id = #gameId#
+	      ,link_url=#linkUrl#
+	     <isNotEmpty prepend="," property="orderNum">
+	      order_num = #orderNum#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE id = #id#
+	</update>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_ref_advert where id = #id#
+	</delete>
+	
+	<select id="getMaxOrderNum" resultClass="java.lang.Integer">
+		select
+		ifnull(max(order_num),0)
+		from 
+		slh_ref_advert
+	</select>
+	
+	<update id="modifyOrderNumByDelete" parameterClass="java.util.Map">
+		update slh_ref_advert set order_num=order_num-1
+		where
+		order_num &gt;#num#
+	</update>
+	
+	
+	<select id="select_slh_weather_list" resultMap="adverResult" parameterClass="adver">
+		SELECT 
+		id,
+		name,
+		link_url,
+		type,
+		image_id,
+		ref_id,
+		order_num,
+		create_time,
+		modify_time
+		FROM slh_ref_advert
+		WHERE 1 = 1 
+		ORDER BY modify_time DESC
+		<isNotEmpty property="pageStatus">
+				LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+		</isNotEmpty>
+	</select>
+	
+	<update id="modifyOrderNumBySave" parameterClass="java.util.Map">
+		update slh_ref_advert set order_num=order_num+1
+		where 
+		order_num &gt;=#oldOrder#
+	</update>
+	
+	<update id="modifyMaxOrderNum" parameterClass="java.util.Map">
+		update slh_ref_advert set order_num=order_num-1
+		where 
+		order_num &gt;#oldOrder#
+		and
+		order_num &lt;=#newOrder#
+	</update>
+	
+	<update id="modifyMinOrderNum" parameterClass="java.util.Map">
+		update slh_ref_advert set order_num=order_num+1
+		where 
+		order_num &lt;#oldOrder#
+		and
+		order_num &gt;=#newOrder#
+	</update>
+	
+	<select id="select_entity_by_getid" resultClass="adver" parameterClass="adver">
+		select
+			id,
+			name,
+			link_url,
+			type,
+			image_id,
+			ref_id,
+			order_num,
+			create_time,
+			modify_time
+		FROM slh_ref_advert
+		WHERE 1=1 
+		<dynamic>
+			<isNotEmpty prepend="and" property="gameId">
+				ref_id=#gameId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<delete id="deleteEntityAll" parameterClass="adver">
+		delete from slh_ref_advert where ref_id=#gameId#
+	</delete>	
+</sqlMap>

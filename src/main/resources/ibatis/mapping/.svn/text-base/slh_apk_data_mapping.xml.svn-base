@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_apk_data">
+
+	<typeAlias alias="apkData" type="com.yancey.manager.domain.ApkData" />
+	
+	<resultMap class="apkData" id="apkDataMap">
+		<result property="bizDate" column="biz_date"/>
+		<result property="bizAppId" column="biz_app_id"/>
+		<result property="channelId" column="channel_id"/>
+		<result property="apkId" column="apk_id"/>
+		<result property="apkName" column="apk_name"/>
+		<result property="downloadPv" column="download_pv"/>
+		<result property="downloadUv" column="download_uv"/>
+		<result property="installPv" column="install_pv"/>
+		<result property="installUv" column="install_uv"/>
+		<result property="createTime" column="create_time"/>
+	</resultMap>
+	
+	<sql id="apk_data_query_conditions" >
+	     <dynamic>
+	    	<isNotEmpty prepend="and" property="startDate">
+	    			<![CDATA[
+	    				biz_date >= #startDate#
+	    			]]>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="endDate">
+	    			<![CDATA[
+	    				biz_date <= #endDate#
+	    			]]>
+	    	</isNotEmpty>
+	     	<isNotEmpty property="channelId" prepend="and">
+		     		channel_id =#channelId# 
+	     	</isNotEmpty>
+	     	<isNotEmpty property="bizAppId" prepend="and">
+		     		biz_app_id =#bizAppId# 
+	     	</isNotEmpty>
+	    </dynamic>
+	</sql>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="apkDataMap" parameterClass="apkData">
+		select 
+			biz_date,
+			biz_app_id,
+			channel_id,
+			apk_id,
+			apk_name,
+			download_pv,
+			download_uv,
+			install_pv,
+			install_uv,
+			create_time
+		from slh_lock_screen_warehourse.slh_apk_data
+		where 1=1
+		<include refid="apk_data_query_conditions"/>
+		order by biz_date desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer" parameterClass="apkData">
+		select 
+		count(1)
+		from slh_lock_screen_warehourse.slh_apk_data
+		where 1=1
+		<include refid="apk_data_query_conditions"/>
+	</select>
+	
+	<select id="select_slh_apk_data_list" resultMap="apkDataMap" parameterClass="apkData">
+		select 
+			biz_date,
+			biz_app_id,
+			channel_id,
+			apk_id,
+			apk_name,
+			download_pv,
+			download_uv,
+			install_pv,
+			install_uv,
+			create_time
+		from slh_lock_screen_warehourse.slh_apk_data 
+		where 1=1
+		<include refid="apk_data_query_conditions"/>
+		order by biz_date desc
+	</select>
+	
+</sqlMap>

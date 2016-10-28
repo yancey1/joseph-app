@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_page_game_deploy">
+
+	<typeAlias alias="gameDeployDomain" type="com.yancey.manager.domain.PageGameDeployDomain" />
+	
+	<resultMap id="gameDeployResult" class="gameDeployDomain" >
+	    <result column="id" property="id" />
+	    <result column="name" property="name" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	</resultMap>
+	
+	<resultMap id="gameDeployMappingResult" class="gameDeployDomain" >
+	    <result column="ass_id" property="assId" />
+	    <result column="game_id" property="gameId" />
+	    <result column="order_num" property="orderNum" />
+	    <result column="game_id" property="pageGameDomain" select="slh_page_game.SELECT_ENTITY_BY_ID" />
+	</resultMap>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="gameDeployDomain">
+		SELECT COUNT(1) FROM slh_page_assembly a WHERE 1 = 1 
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="gameDeployResult" parameterClass="gameDeployDomain">
+		SELECT 
+		id,
+		name,
+		create_time,
+		modify_time
+		FROM
+		slh_page_assembly
+		ORDER BY modify_time desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	
+	<!--页游部署表 -->
+	<select id="GET_DELEPLOY_ENTITY_LIST" resultMap="gameDeployMappingResult" parameterClass="gameDeployDomain">
+		SELECT 
+		m.ass_id,
+		m.game_id,
+		m.order_num
+		FROM
+		slh_page_assembly a,
+		slh_page_game_assembly_mapping m
+		where
+		a.id=m.ass_id
+		and
+		m.ass_id=#id#
+		order by m.order_num
+	</select>
+	
+	<insert id="INSERT_ENTITY" parameterClass="gameDeployDomain">
+		insert into
+		slh_page_game_assembly_mapping
+		(ass_id,game_id,order_num)
+		values
+		(#assId#,#gameId#,#orderNum#)
+	</insert>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_page_game_assembly_mapping where ass_id = #id#
+	</delete>
+	
+	<delete id="deleteObjByMap" parameterClass="java.util.Map">
+		delete from slh_page_game_assembly_mapping where game_id = #gameId#
+	</delete>
+	
+	<select id="select_entity_by_getid" resultMap="gameDeployMappingResult" parameterClass="gameDeployDomain">
+		SELECT 
+		m.ass_id,
+		m.game_id,
+		m.order_num
+		FROM
+		slh_page_assembly a,
+		slh_page_game_assembly_mapping m
+		where
+		a.id=m.ass_id
+		and
+		m.game_id=#gameId#
+	</select>
+	
+</sqlMap>

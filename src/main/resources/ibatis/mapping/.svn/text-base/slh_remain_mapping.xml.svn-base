@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_remain">
+
+	<typeAlias alias="remainData" type="com.yancey.manager.domain.RemainData" />
+	
+	<resultMap class="remainData" id="remainDataMap">
+		<result property="bizDate" column="biz_date"/>
+		<result property="channelId" column="channel_id"/>
+		<result property="bizAppId" column="biz_app_id"/>
+		<result property="firstVisit" column="first_visit"/>
+		<result property="newUser" column="new_user"/>
+		<result property="remain1" column="remain_1"/>
+		<result property="remain2" column="remain_2"/>
+		<result property="remain3" column="remain_3"/>
+		<result property="remain4" column="remain_4"/>
+		<result property="remain5" column="remain_5"/>
+		<result property="remain6" column="remain_6"/>
+		<result property="remain7" column="remain_7"/>
+		<result property="remain10" column="remain_10"/>
+		<result property="remain15" column="remain_15"/>
+		<result property="remain20" column="remain_20"/>
+		<result property="remain30" column="remain_30"/>
+		<result property="createTime" column="create_time"/>
+	</resultMap>
+	
+	<sql id="remain_query_conditions" >
+	     <dynamic>
+	    	<isNotEmpty prepend="and" property="startDate">
+	    			<![CDATA[
+	    				biz_date >= #startDate#
+	    			]]>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="endDate">
+	    			<![CDATA[
+	    				biz_date <= #endDate#
+	    			]]>
+	    	</isNotEmpty>
+	     	<isNotEmpty property="channelId" prepend="and">
+		     		channel_id =#channelId# 
+	     	</isNotEmpty>
+	     	<isNotEmpty property="bizAppId" prepend="and">
+		     		biz_app_id = #bizAppId#
+	     	</isNotEmpty>
+	    </dynamic>
+	</sql>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="remainDataMap" parameterClass="remainData">
+		select 
+		biz_date,
+		CASE 
+		WHEN biz_date =date_format(date_add(SYSDATE(), INTERVAL -1 DAY),'%Y-%m-%d')
+		then 0
+		ELSE remain_1 
+		end as remain_1,
+		channel_id,
+		biz_app_id,
+		(select first_visit_data from slh_lock_screen_warehourse.slh_first_visit_data where biz_date=t.biz_date and channel_id=t.channel_id and biz_app_id=t.biz_app_id) as first_visit,
+		new_user,
+		<!-- remain_1, -->
+		remain_2,
+		remain_3,
+		remain_4,
+		remain_5,
+		remain_6,
+		remain_7,
+		remain_10,
+		remain_15,
+		remain_20,
+		remain_30,
+		create_time
+		from slh_lock_screen_warehourse.slh_remain_info t
+		where 1=1
+		<include refid="remain_query_conditions"/>
+		order by biz_date desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="remainDataMap" parameterClass="remainData">
+		select 
+		biz_date,
+		CASE 
+		WHEN biz_date =date_format(date_add(SYSDATE(), INTERVAL -1 DAY),'%Y-%m-%d')
+		then 0
+		ELSE remain_1 
+		end as remain_1,
+		channel_id,
+		biz_app_id,
+		(select first_visit_data from slh_lock_screen_warehourse.slh_first_visit_data where biz_date=t.biz_date and channel_id=t.channel_id and biz_app_id=t.biz_app_id) as first_visit,
+		new_user,
+		<!-- remain_1, -->
+		remain_2,
+		remain_3,
+		remain_4,
+		remain_5,
+		remain_6,
+		remain_7,
+		remain_10,
+		remain_15,
+		remain_20,
+		remain_30,
+		create_time
+		from slh_lock_screen_warehourse.slh_remain_info t
+		where 1=1
+		<isNotEmpty prepend="and" property="startDate">
+			biz_date &gt;= #startDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endDate">
+			biz_date &lt;= #endDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="channelId">
+			channel_id = #channelId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="bizAppId">
+			biz_app_id = #bizAppId#
+		</isNotEmpty>
+		order by create_time desc
+	</select>
+	
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer" parameterClass="remainData">
+		select 
+		count(1)
+		from slh_lock_screen_warehourse.slh_remain_info
+		where 1=1
+		<include refid="remain_query_conditions"/>
+	</select>
+	
+	
+	<select id="select_slh_remain_list" resultMap="remainDataMap" parameterClass="remainData">
+		select 
+		biz_date,
+		CASE 
+		WHEN biz_date =date_format(date_add(SYSDATE(), INTERVAL -1 DAY),'%Y-%m-%d')
+		then 0
+		ELSE remain_1 
+		end as remain_1,
+		channel_id,
+		biz_app_id,
+		(select first_visit_data from slh_lock_screen_warehourse.slh_first_visit_data where biz_date=t.biz_date and channel_id=t.channel_id and biz_app_id=t.biz_app_id) as first_visit,
+		new_user,
+		<!-- remain_1, -->
+		remain_2,
+		remain_3,
+		remain_4,
+		remain_5,
+		remain_6,
+		remain_7,
+		remain_10,
+		remain_15,
+		remain_20,
+		remain_30,
+		create_time
+		from slh_lock_screen_warehourse.slh_remain_info t
+		where 1=1
+		<include refid="remain_query_conditions"/>
+		order by biz_date desc
+	</select>
+	
+</sqlMap>

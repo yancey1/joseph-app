@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_biz_activity_mapping">
+
+	<typeAlias alias="bizActivityMappDomain" type="com.yancey.manager.domain.BizActivityMappDomain" />
+	
+	<resultMap class="bizActivityMappDomain" id="bizActivityMappDomainMap">
+		<result property="bizId" column="biz_id"/>
+		<result property="activityId" column="activity_id"/>
+		<result property="lotteryDrawActivity" column="activity_id" select="slh_lottery_draw_activity.SELECT_ENTITY_BY_ID"/>
+	</resultMap>
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="bizActivityMappDomainMap" parameterClass="bizActivityMappDomain">
+		select 
+			biz_id,
+			activity_id
+		from slh_biz_activity_mapping
+		where 1=1
+		<dynamic>
+			<isNotEmpty prepend="and" property="bizId">
+				biz_id=#bizId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_biz_activity_mapping where biz_id=#id#
+	</delete>	
+		
+	<insert id="INSERT_ENTITY" parameterClass="bizActivityMappDomain">
+		insert into slh_biz_activity_mapping(biz_id,activity_id)
+		values (#bizId#,#activityId#)
+	</insert>	
+	
+	<delete id="deleteEntityAll" parameterClass="bizActivityMappDomain">
+		delete from slh_biz_activity_mapping where biz_id=#bizId#
+	</delete>	
+	
+</sqlMap>

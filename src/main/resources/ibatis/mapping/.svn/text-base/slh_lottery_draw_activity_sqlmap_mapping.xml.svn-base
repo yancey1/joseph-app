@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_lottery_draw_activity">
+
+	<typeAlias alias="lotteryActivityDomain" type="com.yancey.manager.domain.LotteryDrawActivity" />
+	
+	<resultMap id="lotteryActivityMap" class="lotteryActivityDomain" >
+	    <result column="id" property="id" />
+	    <result column="name" property="name" />
+	    <result column="content" property="content" />
+	    <result column="appoint_start_time" property="appointStartDate" />
+	    <result column="appoint_end_time" property="appointEndDate" />
+	    <result column="type" property="type" />
+	    <result column="is_line" property="isLine" />
+	    <result column="base_cost" property="baseCost" />
+	    <result column="ratio" property="ratio" />
+	    <result column="activity_free_num" property="activityFreeNum" />
+	    <result column="link_url" property="linkUrl" />
+	    <result column="rule" property="rule" />
+	    <result column="creator" property="creator" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	     <result column="image_id" property="image" select="slh_image.selectImageByRefId" />
+	</resultMap>
+	
+	<sql id="slh_lottery_draw_activity_query-conditions" >
+	    <dynamic>
+	      <isNotEmpty prepend="and" property="name" >
+	        name like concat('%',#name#,'%') 
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="lotteryActivityDomain">
+		SELECT COUNT(1) FROM slh_lottery_draw_activity a WHERE 1 = 1 
+		<include refid="slh_lottery_draw_activity_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="lotteryActivityMap" parameterClass="lotteryActivityDomain">
+		SELECT 
+			id,
+			`name`,
+			`content`,
+			image_id,
+			appoint_start_time,
+			appoint_end_time,
+			type,
+			link_url,
+			base_cost,
+			ratio,
+			rule,
+			is_line,
+			activity_free_num,
+			creator,
+			create_time,
+			modify_time
+		FROM slh_lottery_draw_activity t
+		WHERE 1 = 1 
+		<include refid="slh_lottery_draw_activity_query-conditions"/>
+		ORDER BY modify_time desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	
+	<select id="SELECT_ENTITY_BY_ID" resultMap="lotteryActivityMap" parameterClass="java.lang.Integer">
+		SELECT 
+			id,
+			`name`,
+			`content`,
+			image_id,
+			appoint_start_time,
+			appoint_end_time,
+			type,
+			link_url,
+			is_line,
+			rule,
+			base_cost,
+			activity_free_num,
+			ratio,
+			creator,
+			create_time,
+			modify_time
+		FROM slh_lottery_draw_activity
+		WHERE id=#id#
+	</select>
+	
+	
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="lotteryActivityMap" parameterClass="lotteryActivityDomain">
+		SELECT 
+			id,
+			`name`,
+			`content`,
+			image_id,
+			appoint_start_time,
+			appoint_end_time,
+			type,
+			link_url,
+			is_line,
+			rule,
+			base_cost,
+			activity_free_num,
+			ratio,
+			creator,
+			create_time,
+			modify_time
+		FROM slh_lottery_draw_activity
+		WHERE 1 = 1 
+		<dynamic>
+			<isNotEmpty prepend="and" property="name">
+				name like concat('%',#name#,'%') 
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	
+	<select id="select_slh_lottery_draw_activity_page_list" resultMap="lotteryActivityMap" parameterClass="lotteryActivityDomain">
+		select 
+			id,
+			`name`,
+			`content`,
+			image_id,
+			appoint_start_time,
+			appoint_end_time,
+			type,
+			link_url,
+			is_line,
+			rule,
+			base_cost,
+			activity_free_num,
+			ratio,
+			creator,
+			create_time,
+			modify_time
+		FROM slh_lottery_draw_activity
+		where 1=1 
+		<dynamic>
+			<isNotEmpty prepend="and" property="name">
+				name like concat('%',#name#,'%') 
+			</isNotEmpty>
+		</dynamic>
+		order by modify_time desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="select_slh_draw_activity_page_list" resultMap="lotteryActivityMap" parameterClass="lotteryActivityDomain">
+		select 
+			t1.id,
+			t1.`name`,
+			t1.`content`,
+			t1.image_id,
+			t1.appoint_start_time,
+			t1.appoint_end_time,
+			t1.type,
+			t1.link_url,
+			t1.is_line,
+			t1.rule,
+			t1.base_cost,
+			t1.activity_free_num,
+			t1.ratio,
+			t1.creator,
+			t1.create_time,
+			t1.modify_time
+		FROM slh_lottery_draw_activity t1,
+				slh_activity_mapping t2,
+				slh_activity t3
+		where  t1.id=t2.ref_id and t3.id=t2.id and t3.state=2 and 1=1 
+		<dynamic>
+			<isNotEmpty prepend="and" property="name">
+				t1.name like concat('%',#name#,'%') 
+			</isNotEmpty>
+		</dynamic>
+		order by modify_time desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	
+	<insert id="INSERT_ENTITY" parameterClass="lotteryActivityDomain" >
+		INSERT INTO slh_lottery_draw_activity(name,content,image_id,appoint_start_time,appoint_end_time,type,link_url,is_line,
+		base_cost,ratio,activity_free_num,rule,creator,create_time, modify_time)
+	 	VALUES(#name#,#content#,#imageId#,#appointStartDate#,#appointEndDate#,
+	 	#type#,#linkUrl#,#isLine#,#baseCost#,#ratio#,#activityFreeNum#,#rule#,#creator#,NOW(), NOW())
+		<selectKey resultClass="java.lang.Integer" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<update id="UPDATE_ENTITY" parameterClass="lotteryActivityDomain" >
+	  UPDATE slh_lottery_draw_activity SET modify_time = NOW()
+	  <dynamic>
+	    <isNotEmpty prepend="," property="name">
+	      name = #name#
+	    </isNotEmpty>
+	    <isNotNull prepend="," property="content">
+	      content = #content#
+	    </isNotNull>
+	     <isNotEmpty prepend="," property="imageId">
+	      image_id = #imageId#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="appointStartDate">
+	      appoint_start_time = #appointStartDate#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="appointEndDate">
+	      appoint_end_time = #appointEndDate#
+	    </isNotEmpty>
+	     <isNotEmpty prepend="," property="linkUrl">
+	      link_url = #linkUrl#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="htmlContent">
+	      html_content = #htmlContent#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="isLine">
+	      is_line = #isLine#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="type">
+	      type = #type#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="baseCost">
+	      base_cost = #baseCost#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="ratio">
+	      ratio = #ratio#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="activityFreeNum">
+	      activity_free_num = #activityFreeNum#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="," property="rule">
+	      rule = #rule#
+	    </isNotEmpty>
+	  </dynamic>
+	  WHERE id = #id#
+	</update>
+	
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_lottery_draw_activity where id = #id#
+	</delete>
+	
+	<select id="checkLotteryDrawActivity" resultMap="lotteryActivityMap" parameterClass="lotteryActivityDomain">
+		SELECT 
+			id,
+			`name`,
+			`content`,
+			image_id,
+			appoint_start_time,
+			appoint_end_time,
+			type,
+			link_url,
+			base_cost,
+			ratio,
+			rule,
+			is_line,
+			activity_free_num,
+			creator,
+			create_time,
+			modify_time
+		FROM slh_lottery_draw_activity t
+		WHERE 1 = 1 
+		 <!-- <dynamic>
+	      <isNotEmpty prepend="and" property="appointEndTime" >
+	        	appoint_end_time &gt;=#appointEndTime#
+	      </isNotEmpty>
+	      <isNotEmpty prepend="and" property="appointStartTime" >
+	        	appoint_start_time &lt;= #appointStartTime#
+	      </isNotEmpty>
+	    </dynamic> -->
+	</select>
+</sqlMap>

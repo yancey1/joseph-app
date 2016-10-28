@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_page_game_classify_mapp">
+
+	<typeAlias alias="pageGameClassifyMapp" type="com.yancey.manager.domain.PageGameClassifyMapp" />
+	
+	<resultMap id="pageGameClassifyMappResult" class="pageGameClassifyMapp" >
+	    <result column="cid" property="cid" />
+	    <result column="game_id" property="gameId" />
+	    <result column="order_num" property="orderNum" />
+	    <result property="pageGameDomain" column="game_id" select="slh_page_game.select_slh_page_game_for_game_id"/>
+	</resultMap>
+	
+
+
+	<select id="SELECT_ENTITY_LIST_WITH_OUT_PAGE" resultMap="pageGameClassifyMappResult" parameterClass="pageGameClassifyMapp">
+		SELECT 
+		cid,
+		game_id,
+		order_num
+		FROM slh_page_game_classify_mapping
+		WHERE 1 = 1 
+		<dynamic>
+			<isNotEmpty prepend="and" property="cid">
+				cid =#cid#
+			</isNotEmpty>
+	   
+	    </dynamic>
+	    ORDER BY order_num
+	</select>
+		
+	<delete id="DELETE_ENTITY_BY_ID" parameterClass="java.util.Map">
+		delete from slh_page_game_classify_mapping where cid=#id#
+	</delete>	
+	
+	<insert id="INSERT_ENTITY" parameterClass="pageGameClassifyMapp">
+		insert into slh_page_game_classify_mapping(cid,game_id,order_num)
+		values (#cid#,#gameId#,#orderNum#)
+	</insert>	
+	
+	<delete id="deleteObjByMap" parameterClass="java.util.Map">
+		delete from slh_page_game_classify_mapping where game_id = #gameId#
+	</delete>
+	
+	<select id="select_entity_by_getid" resultMap="pageGameClassifyMappResult" parameterClass="pageGameClassifyMapp">
+		SELECT 
+		m.cid,
+		m.game_id,
+		m.order_num
+		FROM 
+		slh_page_game_classify_mapping m,
+		slh_page_game_classify p
+		where
+		m.cid=p.id
+		and
+		m.game_id=#gameId#
+	</select>
+</sqlMap>

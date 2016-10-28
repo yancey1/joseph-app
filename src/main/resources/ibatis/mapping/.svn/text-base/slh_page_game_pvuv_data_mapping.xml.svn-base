@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_page_game_pvuv_data">
+
+	<typeAlias alias="pageGamePvUvData" type="com.yancey.manager.domain.PageGamePvUvData" />
+	
+	<resultMap class="pageGamePvUvData" id="pageGamePvUvDataMap">
+		<result property="bizDate" column="biz_date"/>
+		<result property="bizAppId" column="biz_app_id"/>
+		<result property="channelId" column="channel_id"/>
+		<result property="gameId" column="game_id"/>
+		<result property="gameName" column="game_name"/>
+		<result property="clickPv" column="click_pv"/>
+		<result property="clickUv" column="click_uv"/>
+		<result property="createTime" column="create_time"/>
+	</resultMap>
+	
+	<sql id="page_game_pvuv_data_query_conditions" >
+	     <dynamic>
+	    	<isNotEmpty prepend="and" property="startDate">
+	    			<![CDATA[
+	    				biz_date >= #startDate#
+	    			]]>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="endDate">
+	    			<![CDATA[
+	    				biz_date <= #endDate#
+	    			]]>
+	    	</isNotEmpty>
+	     	<isNotEmpty property="channelId" prepend="and">
+		     		channel_id =#channelId# 
+	     	</isNotEmpty>
+	     	<isNotEmpty property="bizAppId" prepend="and">
+		     		biz_app_id =#bizAppId# 
+	     	</isNotEmpty>
+	    </dynamic>
+	</sql>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="pageGamePvUvDataMap" parameterClass="pageGamePvUvData">
+		select 
+			biz_date,
+			biz_app_id,
+			channel_id,
+			game_id,
+			game_name,
+			click_pv,
+			click_uv,
+			create_time
+		from slh_lock_screen_warehourse.slh_page_game_pvuv_data 
+		where 1=1
+		<include refid="page_game_pvuv_data_query_conditions"/>
+		order by biz_date desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer" parameterClass="pageGamePvUvData">
+		select 
+		count(1)
+		from slh_lock_screen_warehourse.slh_page_game_pvuv_data
+		where 1=1
+		<include refid="page_game_pvuv_data_query_conditions"/>
+	</select>
+	
+	<select id="select_slh_page_game_pvuv_data_list" resultMap="pageGamePvUvDataMap" parameterClass="pageGamePvUvData">
+		select 
+			biz_date,
+			biz_app_id,
+			channel_id,
+			game_id,
+			game_name,
+			click_pv,
+			click_uv,
+			create_time
+		from slh_lock_screen_warehourse.slh_page_game_pvuv_data 
+		where 1=1
+		<include refid="page_game_pvuv_data_query_conditions"/>
+		order by biz_date desc
+	</select>
+	
+</sqlMap>

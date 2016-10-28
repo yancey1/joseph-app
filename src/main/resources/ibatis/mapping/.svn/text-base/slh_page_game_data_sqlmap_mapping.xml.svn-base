@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_page_game_data">
+
+	<typeAlias alias="pageGameDataDomain" type="com.yancey.manager.domain.PageGameDataDomain" />
+	
+	<resultMap id="pageGameDataResult" class="pageGameDataDomain" >
+	    <result column="game_id" property="gameId" />
+	    <result column="game_name" property="gameName" />
+	    <result column="init_delta_num" property="initDeltaNum" />
+	    <result column="real_player_num" property="realPlayerNum" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	</resultMap>
+	
+	<sql id="slh_page_game_data_query-conditions" >
+	    <dynamic>
+	      	<isNotEmpty prepend="and" property="gameId">
+				game_id =#gameId#
+			</isNotEmpty>
+	      	<isNotEmpty prepend="and" property="gameName">
+				game_name =#gameName#
+			</isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="SELECT_ENTITY_COUNT" resultClass="java.lang.Integer"	parameterClass="pageGameDataDomain">
+		SELECT COUNT(1) FROM slh_page_game_data_info a WHERE 1 = 1 
+		<include refid="slh_page_game_data_query-conditions"/>
+	</select>
+	
+	<select id="SELECT_ENTITY_LIST" resultMap="pageGameDataResult" parameterClass="pageGameDataDomain">
+		SELECT 
+			game_id,
+			game_name,
+			init_delta_num,
+			real_player_num,
+			create_time,
+			modify_time
+		FROM slh_page_game_data_info
+		WHERE 1 = 1 
+		<include refid="slh_page_game_data_query-conditions"/>
+		ORDER BY modify_time desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows# 
+	</select>
+	
+	
+</sqlMap>
