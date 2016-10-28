@@ -89,7 +89,7 @@ public class VipServiceImpl implements IVipService {
 	         InputStream fis=new FileInputStream("d://11.txt");
 	         InputStreamReader isr=new InputStreamReader(fis,"GBK");
 			 BufferedReader br1 = new BufferedReader (isr);
-	         OutputStream fos=new FileOutputStream("d://22.txt");
+	         OutputStream fos=new FileOutputStream("d://22.tx t");
 	         FileWriter fw=new FileWriter("d://22.txt");
 	         PrintWriter pw=new PrintWriter(fw);
 	         int count=0;
