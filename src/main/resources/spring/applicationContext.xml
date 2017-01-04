@@ -28,9 +28,11 @@
 	
     <!-- 系统日志AOP配置 -->
 	<aop:aspectj-autoproxy/>   
+	
 	<bean id="logAspect" class="com.yancey.manager.aop.LogAspect">
 	    <property name="systemLogService" ref="systemLogService"/>
 	</bean>    
+	
 	<aop:config>  
         <aop:aspect ref="logAspect">  
             <aop:pointcut id="logPointCut" expression="execution(* com.yancey.manager.service.impl.*.*(..))"/>  

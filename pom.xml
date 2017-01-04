@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.yancey</groupId>
   <artifactId>joseph-app</artifactId>
-  <packaging>war</packaging>
+  <packaging>jar</packaging>
   <version>0.0.1-SNAPSHOT</version>
   <name>joseph-app Maven Webapp</name>
   <url>http://maven.apache.org</url>
@@ -430,8 +430,14 @@
 	     <groupId>com.alibaba</groupId>
 	     <artifactId>fastjson</artifactId>
 	     <version>1.2.7</version>
-	</dependency>
-	</dependencies>
+		</dependency>
+		
+		<dependency>
+		  <groupId>com.caucho</groupId>
+		  <artifactId>hessian</artifactId>
+		  <version>4.0.7</version>
+		 </dependency>
+	    </dependencies>
 	<build>
 		<plugins>
 			<!-- 测试插件:运行测试类;跳过失败的单元测试... -->
@@ -519,7 +525,7 @@
 		    <url>http://114.55.238.89:8091/nexus/content/repositories/releases</url> 
 		</repository> 
 		<snapshotRepository> 
-		    <id>Snapshots</id> 
+		    <id>snapshots</id> 
 		    <name>Internal Snapshots</name> 
 		    <url>http://114.55.238.89:8091/nexus/content/repositories/snapshots</url> 
 		</snapshotRepository> 
