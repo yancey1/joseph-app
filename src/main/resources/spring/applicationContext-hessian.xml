@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd" default-autowire="byName">
+	
+	
+	<bean id="httpRequestHandlerAdapter" class="org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter"/>
+	
+	<bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"/>
+	
+	<bean name="/remote/testHessianService.htm" class="org.springframework.remoting.caucho.HessianServiceExporter">
+        <property name="service" ref="hessianServiceImpl" />
+        <property name="serviceInterface" value="com.yancey.manager.service.HessianService" />
+	</bean>
+	
+</beans>
